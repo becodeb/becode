@@ -1,4 +1,5 @@
 ---
+import ChatBot from '@/components/react/ChatBot';
 import '@/styles/global.css';
 
 export interface Props {
@@ -58,6 +59,7 @@ const socialImage = new URL('/og.svg', Astro.site);
       Ir al contenido
     </a>
     <slot />
+    <ChatBot client:idle />
     <script is:inline>
       const revealElements = Array.from(document.querySelectorAll('.reveal'));
 
