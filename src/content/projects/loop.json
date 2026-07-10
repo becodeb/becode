@@ -2,8 +2,12 @@
   "name": "Loop",
   "url": "https://loop.reditinere.com",
   "description": "Una experiencia web enfocada en convertir recorridos complejos en acciones simples.",
-  "stack": ["Next.js", "TypeScript"],
+  "stack": [
+    "Next.js",
+    "TypeScript"
+  ],
   "category": "Web",
   "status": "En producción",
-  "order": 14
+  "order": 14,
+  "screenshot": "/screenshots/loop.webp"
 }

@@ -2,8 +2,12 @@
   "name": "Digital Survivor",
   "url": "https://digitalsurvivor.bauhub.online/story",
   "description": "Narrativa interactiva que convierte decisiones digitales en una experiencia jugable.",
-  "stack": ["React", "Game Design"],
+  "stack": [
+    "React",
+    "Game Design"
+  ],
   "category": "Experimentos",
   "status": "En producción",
-  "order": 17
+  "order": 17,
+  "screenshot": "/screenshots/digital-survivor.webp"
 }

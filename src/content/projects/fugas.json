@@ -2,8 +2,12 @@
   "name": "Fugas",
   "url": "https://fugas.bauhub.online/alertas",
   "description": "Alertas y seguimiento de incidentes para actuar rápido y sostener cada caso.",
-  "stack": ["React", "Node.js"],
+  "stack": [
+    "React",
+    "Node.js"
+  ],
   "category": "Gestión",
   "status": "En producción",
-  "order": 11
+  "order": 11,
+  "screenshot": "/screenshots/fugas.webp"
 }

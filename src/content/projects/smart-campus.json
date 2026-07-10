@@ -2,8 +2,13 @@
   "name": "Smart Campus",
   "url": "https://smartcampus.bauhub.online",
   "description": "Plataforma multi-tenant para asistencia facial, visitas y gestión de staff educativo.",
-  "stack": ["React", "Computer Vision", "SaaS"],
+  "stack": [
+    "React",
+    "Computer Vision",
+    "SaaS"
+  ],
   "category": "EdTech",
   "status": "En producción",
-  "order": 7
+  "order": 7,
+  "screenshot": "/screenshots/smart-campus.webp"
 }

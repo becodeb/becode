@@ -2,8 +2,12 @@
   "name": "CheckInOut",
   "url": "https://checkinout.bauhub.online/",
   "description": "Registro de ingresos y egresos con una experiencia rápida para personas y equipos.",
-  "stack": ["React", "PWA"],
+  "stack": [
+    "React",
+    "PWA"
+  ],
   "category": "Gestión",
   "status": "En producción",
-  "order": 12
+  "order": 12,
+  "screenshot": "/screenshots/checkinout.webp"
 }

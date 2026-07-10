@@ -2,8 +2,12 @@
   "name": "ClipVault",
   "url": "https://clipvault.bauhub.online",
   "description": "Biblioteca digital para guardar, organizar y recuperar contenido sin perder contexto.",
-  "stack": ["React", "Cloud Storage"],
+  "stack": [
+    "React",
+    "Cloud Storage"
+  ],
   "category": "Web",
   "status": "En producción",
-  "order": 15
+  "order": 15,
+  "screenshot": "/screenshots/clipvault.webp"
 }

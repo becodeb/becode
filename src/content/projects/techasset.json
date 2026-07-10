@@ -2,8 +2,13 @@
   "name": "TechAsset",
   "url": "https://techasset.bauhub.online",
   "description": "Inventario y préstamos de dispositivos para instituciones educativas, sin planillas sueltas.",
-  "stack": ["React", "Node.js", "PostgreSQL"],
+  "stack": [
+    "React",
+    "Node.js",
+    "PostgreSQL"
+  ],
   "category": "Gestión",
   "status": "En producción",
-  "order": 8
+  "order": 8,
+  "screenshot": "/screenshots/techasset.webp"
 }
