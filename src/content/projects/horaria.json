@@ -1,0 +1,9 @@
+{
+  "name": "Horaria",
+  "url": "https://horaria.bauhub.online/planner",
+  "description": "Planificación visual de horarios que detecta conflictos antes de que lleguen al aula.",
+  "stack": ["React", "Optimización"],
+  "category": "EdTech",
+  "status": "En producción",
+  "order": 10
+}

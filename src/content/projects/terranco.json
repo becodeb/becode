@@ -1,0 +1,9 @@
+{
+  "name": "Terranco",
+  "url": "https://terranco.becode.com.ar",
+  "description": "Producto digital pensado para transformar información compleja en decisiones concretas.",
+  "stack": ["Next.js", "PostgreSQL"],
+  "category": "Productos",
+  "status": "En lanzamiento",
+  "order": 3
+}

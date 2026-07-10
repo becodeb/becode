@@ -1,0 +1,34 @@
+---
+import ContactForm from '@/components/react/ContactForm';
+---
+
+<section
+  id="contacto"
+  data-scan
+  class="section-space border-line bg-surface border-t"
+>
+  <div class="shell grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+    <div class="reveal">
+      <p class="eyebrow text-signal mb-5">Empecemos</p>
+      <h2 class="section-title">¿Qué hay que destrabar?</h2>
+      <p class="text-muted mt-7 max-w-md text-lg leading-8">
+        Contanos dónde estás y qué debería poder hacer el producto. Volvemos con
+        preguntas concretas.
+      </p>
+      <div class="mt-12">
+        <p class="text-muted text-sm">También podés escribir directo</p>
+        <a
+          class="font-display decoration-signal mt-2 inline-block text-2xl font-semibold underline decoration-2 underline-offset-4 sm:text-3xl"
+          href="mailto:hola@becode.com.ar"
+        >
+          hola@becode.com.ar
+        </a>
+      </div>
+    </div>
+    <div
+      class="reveal border-line bg-paper rounded-[var(--radius-ui)] border p-5 sm:p-8"
+    >
+      <ContactForm client:visible />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,123 @@
+---
+import { Image } from 'astro:assets';
+import logoBe from '@/assets/logo-be.png';
+---
+
+<header
+  class="border-line/80 bg-paper/90 fixed inset-x-0 top-0 z-50 border-b backdrop-blur-md"
+>
+  <nav
+    class="shell flex h-16 items-center justify-between"
+    aria-label="Navegación principal"
+  >
+    <a href="#inicio" class="header-brand" aria-label="becode, inicio">
+      <span class="brand-symbol-crop" aria-hidden="true">
+        <Image
+          src={logoBe}
+          alt=""
+          width={64}
+          height={64}
+          densities={[1, 2]}
+          format="webp"
+          quality={82}
+          class="brand-symbol-image"
+        />
+      </span>
+    </a>
+    <div class="hidden items-center gap-8 text-sm font-semibold md:flex">
+      <a class="hover:text-signal transition-colors" href="#proyectos"
+        >Proyectos</a
+      >
+      <a class="hover:text-signal transition-colors" href="#servicios"
+        >Servicios</a
+      >
+      <a class="hover:text-signal transition-colors" href="#proceso">Proceso</a>
+      <a
+        class="bg-ink text-surface hover:bg-signal rounded-[var(--radius-ui)] px-4 py-2.5 transition-colors active:translate-y-px"
+        href="#contacto">Hablemos</a
+      >
+    </div>
+    <details class="relative md:hidden">
+      <summary
+        class="border-ink flex h-10 cursor-pointer list-none items-center rounded-[var(--radius-ui)] border px-3 text-sm font-bold marker:hidden"
+      >
+        Menú
+      </summary>
+      <div
+        class="border-line bg-surface shadow-window absolute top-12 right-0 flex w-52 flex-col rounded-[var(--radius-ui)] border p-2"
+      >
+        <a
+          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
+          href="#proyectos">Proyectos</a
+        >
+        <a
+          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
+          href="#servicios">Servicios</a
+        >
+        <a
+          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
+          href="#proceso">Proceso</a
+        >
+        <a
+          class="bg-ink text-surface rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
+          href="#contacto">Hablemos</a
+        >
+      </div>
+    </details>
+  </nav>
+</header>
+
+<style>
+  .header-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+  }
+
+  .brand-symbol-crop {
+    position: relative;
+    width: 2.75rem;
+    height: 2rem;
+    overflow: hidden;
+    flex: 0 0 auto;
+  }
+
+  .brand-symbol-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4rem;
+    max-width: none;
+    height: 4rem;
+    mix-blend-mode: multiply;
+    transform: translate(-50%, -50%);
+  }
+</style>
+
+<script>
+  const mobileNavigation =
+    document.querySelector<HTMLDetailsElement>('header details');
+  mobileNavigation?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      mobileNavigation.open = false;
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (
+      mobileNavigation?.open &&
+      event.target instanceof Node &&
+      !mobileNavigation.contains(event.target)
+    ) {
+      mobileNavigation.open = false;
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && mobileNavigation?.open) {
+      mobileNavigation.open = false;
+      mobileNavigation.querySelector('summary')?.focus();
+    }
+  });
+</script>

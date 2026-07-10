@@ -1,0 +1,9 @@
+{
+  "name": "NexusOS",
+  "url": "https://nexusos.becode.com.ar",
+  "description": "Un sistema operativo de negocio que reúne procesos, datos y equipos en un solo lugar.",
+  "stack": ["Next.js", "PostgreSQL"],
+  "category": "Productos",
+  "status": "En lanzamiento",
+  "order": 6
+}

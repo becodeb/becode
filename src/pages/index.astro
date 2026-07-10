@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import Contact from '@/components/astro/Contact.astro';
+import Footer from '@/components/astro/Footer.astro';
+import Header from '@/components/astro/Header.astro';
+import Hero from '@/components/astro/Hero.astro';
+import Process from '@/components/astro/Process.astro';
+import ProjectSection from '@/components/astro/ProjectSection.astro';
+import Services from '@/components/astro/Services.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout
+  title="becode | Software a medida y productos digitales"
+  description="Diseñamos y desarrollamos productos web, sistemas de gestión y plataformas educativas a medida. Software claro para operaciones reales."
+>
+  <Header />
+  <main id="contenido">
+    <Hero />
+    <ProjectSection projects={projects} />
+    <Services />
+    <Process />
+    <Contact />
+  </main>
+  <Footer />
+</BaseLayout>

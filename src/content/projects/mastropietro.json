@@ -1,0 +1,9 @@
+{
+  "name": "Mastropietro",
+  "url": "https://mastropietro.com.ar",
+  "description": "Presencia digital sobria y directa para una práctica profesional con identidad propia.",
+  "stack": ["Astro", "TypeScript"],
+  "category": "Web",
+  "status": "En producción",
+  "order": 16
+}

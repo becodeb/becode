@@ -1,0 +1,9 @@
+{
+  "name": "Lumière",
+  "url": "https://lumiere.becode.com.ar",
+  "description": "Una experiencia digital donde la imagen, la narrativa y el producto comparten escena.",
+  "stack": ["Astro", "TypeScript"],
+  "category": "Productos",
+  "status": "En lanzamiento",
+  "order": 1
+}

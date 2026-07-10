@@ -1,0 +1,9 @@
+{
+  "name": "Typely",
+  "url": "https://typely.bauhub.online",
+  "description": "Alfabetización digital gamificada para que chicos de primaria aprendan haciendo.",
+  "stack": ["React", "Gamificación"],
+  "category": "EdTech",
+  "status": "En producción",
+  "order": 9
+}

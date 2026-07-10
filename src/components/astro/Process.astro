@@ -1,0 +1,99 @@
+---
+const steps = [
+  {
+    title: 'Entender',
+    text: 'Mapeamos usuarios, restricciones y qué resultado tiene que mover el proyecto.',
+    command: 'inspect(problem)',
+  },
+  {
+    title: 'Definir',
+    text: 'Convertimos lo aprendido en flujos, alcance y una dirección de producto compartida.',
+    command: 'shape(scope)',
+  },
+  {
+    title: 'Construir',
+    text: 'Diseñamos y desarrollamos en ciclos cortos, con avances concretos para revisar.',
+    command: 'ship(product)',
+  },
+  {
+    title: 'Sostener',
+    text: 'Ponemos en producción, medimos y acompañamos la evolución sin soltar el contexto.',
+    command: 'observe(real_use)',
+  },
+];
+---
+
+<section id="proceso" data-scan class="section-space bg-ink text-surface">
+  <div class="shell">
+    <div class="reveal max-w-3xl">
+      <p class="eyebrow text-signal mb-5">Cómo trabajamos</p>
+      <h2 class="section-title">Con método, sin teatro.</h2>
+      <p class="text-dim mt-7 max-w-xl leading-7">
+        Siempre sabés qué estamos resolviendo, qué sigue y por qué tomamos cada
+        decisión.
+      </p>
+    </div>
+    <ol
+      class="reveal bg-dim/30 mt-16 grid gap-px overflow-hidden rounded-[var(--radius-ui)] md:grid-cols-2 xl:grid-cols-4"
+    >
+      {
+        steps.map((step, index) => (
+          <li class="process-step bg-ink min-h-64 p-7 sm:p-9">
+            <span class="text-signal font-mono text-sm font-semibold">
+              0{index + 1}
+            </span>
+            <code>{step.command}</code>
+            <h3 class="font-display mt-16 text-3xl font-semibold">
+              {step.title}
+            </h3>
+            <p class="text-dim mt-4 text-sm leading-6">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process-step {
+    position: relative;
+    overflow: hidden;
+    transition: transform 260ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .process-step::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0.2rem;
+    background: var(--color-signal);
+    content: '';
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 300ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .process-step code {
+    position: absolute;
+    top: 2.25rem;
+    right: 2.25rem;
+    color: var(--color-dim);
+    font: 400 0.62rem var(--font-mono);
+  }
+
+  .process-step:hover {
+    transform: translateY(-0.35rem);
+  }
+
+  .process-step:hover::after {
+    transform: scaleX(1);
+  }
+
+  @media (max-width: 29rem) {
+    .process-step code {
+      top: 1.85rem;
+      right: 1.75rem;
+    }
+  }
+</style>

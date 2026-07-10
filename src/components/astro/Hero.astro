@@ -1,0 +1,597 @@
+<section
+  id="inicio"
+  class="relative flex min-h-[calc(100dvh-2.5rem)] items-center overflow-hidden pt-20 pb-2 sm:pb-12"
+>
+  <div
+    class="shell grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16"
+  >
+    <div class="hero-copy relative z-10">
+      <p class="font-display mb-5 text-2xl font-bold sm:mb-7 sm:text-3xl">
+        be<span class="text-signal">/</span>code
+      </p>
+      <h1 class="display-title">Software que hace avanzar.</h1>
+      <p
+        class="text-muted mt-5 max-w-lg text-base leading-7 sm:mt-7 sm:text-lg"
+      >
+        Productos web y sistemas de gestión pensados, diseñados y programados a
+        medida.
+      </p>
+      <div class="mt-7 flex flex-wrap gap-3 sm:mt-9">
+        <a
+          href="#contacto"
+          class="bg-signal text-surface hover:bg-signal-dark rounded-[var(--radius-ui)] px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+        >
+          Hablemos <span aria-hidden="true">↗</span>
+        </a>
+        <a
+          href="#proyectos"
+          class="border-ink hover:bg-ink hover:text-surface rounded-[var(--radius-ui)] border px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+        >
+          Ver proyectos
+        </a>
+      </div>
+    </div>
+
+    <div
+      class="compiler"
+      role="img"
+      aria-label="Una especificación de producto convirtiéndose en una interfaz"
+    >
+      <div class="compiler-spec" aria-hidden="true">
+        <p>
+          <span class="compiler-key">producto</span>
+          <span class="compiler-value" data-compiler-field="product"
+            >campus</span
+          >
+        </p>
+        <p>
+          <span class="compiler-key">usuarios</span>
+          <span class="compiler-value" data-compiler-field="users">4 roles</span
+          >
+        </p>
+        <p>
+          <span class="compiler-key">flujo</span>
+          <span class="compiler-value" data-compiler-field="flow"
+            >asistencia</span
+          >
+        </p>
+        <p>
+          <span class="compiler-key">estado</span>
+          <strong class="compiler-value" data-compiler-field="status"
+            >compilando</strong
+          >
+        </p>
+        <div class="terminal-command">
+          <span>becode@product:~$</span> deploy --watch<i></i>
+        </div>
+      </div>
+      <div class="product-window">
+        <div class="window-bar">
+          <div class="brand-mark">b<span>/</span></div>
+          <span>Campus central</span>
+          <span class="live-state">En vivo</span>
+        </div>
+        <div class="window-body">
+          <aside>
+            <span class="nav-active">Panel</span>
+            <span>Asistencia</span>
+            <span>Personas</span>
+            <span>Reportes</span>
+          </aside>
+          <div class="dashboard">
+            <div class="dash-heading">
+              <div>
+                <small>Jueves, 9 de julio</small>
+                <h2>Buen día, equipo.</h2>
+              </div>
+              <span class="mock-button">Nueva visita</span>
+            </div>
+            <div class="metric-row">
+              <article>
+                <strong data-count="842">842</strong><span>Presentes</span>
+              </article>
+              <article>
+                <strong data-count="96" data-suffix="%">96%</strong><span
+                  >Asistencia</span
+                >
+              </article>
+              <article>
+                <strong data-count="18">18</strong><span>Visitas</span>
+              </article>
+            </div>
+            <div class="activity">
+              <div class="activity-head">
+                <strong>Actividad</strong><span>Ahora</span>
+              </div>
+              <div class="activity-row">
+                <i></i><span>Ingreso registrado</span><small>10:24</small>
+              </div>
+              <div class="activity-row">
+                <i></i><span>Visita autorizada</span><small>10:18</small>
+              </div>
+              <div class="activity-row">
+                <i></i><span>Reporte actualizado</span><small>10:03</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-copy {
+    animation: hero-in 700ms 100ms both cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .compiler {
+    position: relative;
+    min-height: 35rem;
+    animation: hero-in 800ms 260ms both cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .compiler::before {
+    position: absolute;
+    inset: 8% 3% 2% 12%;
+    border-radius: var(--radius-ui);
+    background: var(--color-signal);
+    content: '';
+    transform: rotate(2deg);
+  }
+
+  .compiler::after {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: var(--color-signal);
+    content: '';
+    opacity: 0.45;
+    pointer-events: none;
+    animation: compiler-scan 3.2s 1.5s infinite cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .compiler-spec {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 16rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-ui);
+    background: var(--color-ink);
+    padding: 1.1rem;
+    color: var(--color-surface);
+    box-shadow: var(--shadow-window);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .compiler-spec p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.12);
+    opacity: 0;
+    animation: spec-in 450ms both;
+  }
+
+  .compiler-spec p:last-child {
+    border: 0;
+  }
+
+  .compiler-spec p:nth-child(1) {
+    animation-delay: 600ms;
+  }
+  .compiler-spec p:nth-child(2) {
+    animation-delay: 760ms;
+  }
+  .compiler-spec p:nth-child(3) {
+    animation-delay: 920ms;
+  }
+  .compiler-spec p:nth-child(4) {
+    animation-delay: 1080ms;
+  }
+  .compiler-key {
+    color: var(--color-dim);
+  }
+
+  .compiler-value {
+    color: var(--color-surface);
+    transition:
+      opacity 120ms ease,
+      transform 120ms ease;
+  }
+
+  .compiler-value.is-updating {
+    opacity: 0.2;
+    transform: translateX(0.35rem);
+  }
+
+  .compiler-spec strong.compiler-value {
+    color: var(--color-signal);
+  }
+
+  .terminal-command {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.45rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    color: var(--color-dim);
+    font-size: 0.62rem;
+    white-space: nowrap;
+  }
+
+  .terminal-command span {
+    color: var(--color-signal);
+  }
+
+  .terminal-command i {
+    width: 0.45rem;
+    height: 0.85rem;
+    background: var(--color-surface);
+    animation: terminal-caret 800ms steps(1) infinite;
+  }
+
+  .product-window {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    bottom: 1.5rem;
+    width: 91%;
+    overflow: hidden;
+    border: 1px solid var(--color-ink);
+    border-radius: var(--radius-ui);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-window);
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+    animation: product-in 700ms 1250ms forwards cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .window-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    height: 3.5rem;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .brand-mark {
+    display: grid;
+    width: 1.75rem;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 0.2rem;
+    background: var(--color-ink);
+    color: var(--color-surface);
+  }
+
+  .brand-mark span,
+  .live-state {
+    color: var(--color-signal);
+  }
+  .live-state {
+    font-family: var(--font-mono);
+  }
+
+  .window-body {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    min-height: 26rem;
+  }
+
+  .window-body aside {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-right: 1px solid var(--color-line);
+    padding: 1.25rem 0.75rem;
+    font-size: 0.68rem;
+    font-weight: 650;
+    color: var(--color-muted);
+  }
+
+  .window-body aside span {
+    padding: 0.55rem 0.65rem;
+  }
+  .window-body .nav-active {
+    border-radius: 0.2rem;
+    background: var(--color-ink);
+    color: var(--color-surface);
+  }
+  .dashboard {
+    min-width: 0;
+    padding: 1.5rem;
+  }
+  .dash-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .dash-heading small {
+    color: var(--color-muted);
+    font-size: 0.61rem;
+  }
+  .dash-heading h2 {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+  }
+  .dash-heading .mock-button {
+    border-radius: 0.2rem;
+    background: var(--color-signal);
+    padding: 0.65rem 0.75rem;
+    color: var(--color-surface);
+    font: 700 0.62rem var(--font-body);
+  }
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+    margin-top: 1.5rem;
+  }
+  .metric-row article {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    border: 1px solid var(--color-line);
+    border-radius: 0.2rem;
+    padding: 0.8rem;
+  }
+  .metric-row strong {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .metric-row span {
+    margin-top: 0.25rem;
+    overflow: hidden;
+    color: var(--color-muted);
+    font-size: 0.58rem;
+    text-overflow: ellipsis;
+  }
+  .activity {
+    margin-top: 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.2rem;
+    padding: 0.85rem;
+  }
+  .activity-head,
+  .activity-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+  .activity-head {
+    padding-bottom: 0.65rem;
+    font-size: 0.66rem;
+  }
+  .activity-head span {
+    color: var(--color-signal);
+  }
+  .activity-row {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.55rem;
+    border-top: 1px solid var(--color-line);
+    padding: 0.65rem 0;
+    font-size: 0.58rem;
+  }
+  .activity-row i {
+    width: 0.38rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-signal);
+  }
+  .activity-row small {
+    color: var(--color-muted);
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+  }
+  @keyframes spec-in {
+    from {
+      opacity: 0;
+      transform: translateX(-0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes product-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes compiler-scan {
+    from {
+      transform: translateY(1rem);
+    }
+    to {
+      transform: translateY(31rem);
+    }
+  }
+
+  @keyframes terminal-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes terminal-drift {
+    from {
+      translate: 0 1.5rem;
+    }
+    to {
+      translate: 0 -2rem;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .compiler-spec {
+      animation: terminal-drift linear both;
+      animation-range: cover 0% cover 100%;
+      animation-timeline: view();
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .compiler {
+      min-height: 34rem;
+    }
+    .product-window {
+      width: 92%;
+    }
+  }
+
+  @media (max-width: 37.5rem) {
+    .compiler {
+      min-height: 20rem;
+    }
+    .compiler-spec {
+      width: 12.5rem;
+      padding: 0.75rem;
+      font-size: 0.59rem;
+    }
+    .terminal-command {
+      gap: 0.25rem;
+      font-size: 0.48rem;
+    }
+    .product-window {
+      bottom: 1rem;
+      width: 122%;
+      scale: 0.78;
+      transform-origin: right bottom;
+    }
+    .window-body {
+      grid-template-columns: 4.4rem 1fr;
+      min-height: 16rem;
+    }
+    .window-body aside {
+      padding: 0.9rem 0.35rem;
+      font-size: 0.5rem;
+    }
+    .window-body aside span {
+      padding: 0.45rem 0.35rem;
+    }
+    .dashboard {
+      padding: 0.85rem;
+    }
+    .dash-heading h2 {
+      font-size: 0.9rem;
+    }
+    .dash-heading .mock-button {
+      padding: 0.5rem;
+      font-size: 0.48rem;
+    }
+    .metric-row {
+      gap: 0.35rem;
+      margin-top: 1rem;
+    }
+    .metric-row article {
+      padding: 0.5rem;
+    }
+    .metric-row strong {
+      font-size: 0.9rem;
+    }
+    .metric-row span {
+      font-size: 0.45rem;
+    }
+    .activity {
+      padding: 0.5rem;
+    }
+    .activity-row {
+      gap: 0.3rem;
+      font-size: 0.48rem;
+    }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('#inicio');
+  const terminal = hero?.querySelector<HTMLElement>('.compiler-spec');
+  const reducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches;
+
+  const terminalStates = [
+    {
+      product: 'campus',
+      users: '4 roles',
+      flow: 'asistencia',
+      status: 'compilando',
+    },
+    {
+      product: 'inventario',
+      users: '1.248 activos',
+      flow: 'préstamos',
+      status: 'sincronizando',
+    },
+    {
+      product: 'horarios',
+      users: '37 sedes',
+      flow: 'optimización',
+      status: 'validando',
+    },
+    {
+      product: 'check-in',
+      users: '842 hoy',
+      flow: 'accesos',
+      status: 'desplegado',
+    },
+  ] as const;
+
+  let terminalStateIndex = 0;
+  let terminalTimer: number | undefined;
+
+  const cycleTerminal = () => {
+    terminalStateIndex = (terminalStateIndex + 1) % terminalStates.length;
+    const nextState = terminalStates[terminalStateIndex];
+    if (!nextState) return;
+
+    for (const [key, value] of Object.entries(nextState)) {
+      const field = terminal?.querySelector<HTMLElement>(
+        `[data-compiler-field="${key}"]`,
+      );
+      if (!field) continue;
+      field.classList.add('is-updating');
+      window.setTimeout(() => {
+        field.textContent = value;
+        field.classList.remove('is-updating');
+      }, 120);
+    }
+  };
+
+  if (terminal && !reducedMotion) {
+    const terminalObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && terminalTimer === undefined) {
+          terminalTimer = window.setInterval(cycleTerminal, 2600);
+        } else if (!entry?.isIntersecting && terminalTimer !== undefined) {
+          window.clearInterval(terminalTimer);
+          terminalTimer = undefined;
+        }
+      },
+      { threshold: 0.2 },
+    );
+    terminalObserver.observe(terminal);
+  }
+</script>

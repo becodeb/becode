@@ -1,0 +1,283 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { animate, onScroll } from 'animejs';
+import { ProjectImage } from './ProjectImage';
+
+export interface ProjectData {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  stack: string[];
+  category: 'Productos' | 'EdTech' | 'Gestión' | 'Web' | 'Experimentos';
+  status: 'En producción' | 'En lanzamiento';
+  order: number;
+  screenshot?: string | undefined;
+}
+
+export interface ProjectGridProps {
+  projects: ProjectData[];
+}
+
+interface ProjectCardProps {
+  project: ProjectData;
+  index: number;
+  prominence: 'primary' | 'featured' | 'compact';
+}
+
+const filters = [
+  'Todos',
+  'Productos',
+  'EdTech',
+  'Gestión',
+  'Web',
+  'Experimentos',
+] as const;
+type Filter = (typeof filters)[number];
+
+function ProjectCard({ project, index, prominence }: ProjectCardProps) {
+  const isPrimary = prominence === 'primary';
+  const isFeatured = prominence !== 'compact';
+
+  return (
+    <article
+      className={`project-card project-card--${prominence} ${
+        isFeatured ? 'project-card--spotlight' : ''
+      } min-w-0`}
+    >
+      <a
+        href={project.url}
+        target="_blank"
+        rel="noreferrer"
+        className="project-visual border-line bg-surface block overflow-hidden rounded-[var(--radius-ui)] border"
+        data-project-reveal
+        aria-label={`Visitar ${project.name}, abre en una pestaña nueva`}
+      >
+        <div
+          className={
+            isPrimary
+              ? 'project-frame aspect-[16/9]'
+              : 'project-frame aspect-[16/10]'
+          }
+        >
+          <ProjectImage
+            name={project.name}
+            category={project.category}
+            screenshot={project.screenshot}
+            priority={index < 3}
+            variant={index}
+          />
+        </div>
+        <span className="project-curtain" aria-hidden="true">
+          <span>load.project_{String(index + 1).padStart(2, '0')}</span>
+        </span>
+      </a>
+
+      <div className="project-copy" data-project-copy>
+        <div className="flex items-center justify-between gap-4">
+          <p className="project-status text-signal font-mono font-semibold uppercase">
+            {project.status}
+          </p>
+          {isFeatured && (
+            <span className="project-index text-muted font-mono text-xs">
+              {String(index + 1).padStart(2, '0')} / 03
+            </span>
+          )}
+        </div>
+        <div className="mt-2 flex items-start justify-between gap-4">
+          <h3 className="project-name font-display font-semibold">
+            {project.name}
+          </h3>
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noreferrer"
+            className="project-arrow border-ink hover:bg-ink hover:text-surface grid shrink-0 place-items-center rounded-[var(--radius-ui)] border font-bold transition-colors"
+            aria-label={`Abrir ${project.name} en una pestaña nueva`}
+            title="Abrir proyecto"
+          >
+            ↗
+          </a>
+        </div>
+        <p className="project-description text-muted mt-3 leading-6">
+          {project.description}
+        </p>
+        <ul
+          className="project-stack mt-4 flex flex-wrap gap-x-3 gap-y-1"
+          aria-label={`Tecnologías de ${project.name}`}
+        >
+          {project.stack.map((technology) => (
+            <li key={technology} className="text-muted font-mono">
+              {technology}
+            </li>
+          ))}
+        </ul>
+        {isFeatured && (
+          <span className="project-category mt-7 block font-mono text-[0.65rem] uppercase">
+            {project.category}
+          </span>
+        )}
+      </div>
+    </article>
+  );
+}
+
+export default function ProjectGrid({ projects }: ProjectGridProps) {
+  const [activeFilter, setActiveFilter] = useState<Filter>('Todos');
+  const portfolioRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  const visibleProjects = useMemo(
+    () =>
+      activeFilter === 'Todos'
+        ? projects
+        : projects.filter((project) => project.category === activeFilter),
+    [activeFilter, projects],
+  );
+
+  const featuredProjects = visibleProjects.slice(0, 3);
+  const compactProjects = visibleProjects.slice(3);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const portfolio = portfolioRef.current;
+    if (!portfolio) return;
+    const top = portfolio.getBoundingClientRect().top + window.scrollY - 80;
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: reducedMotion ? 'auto' : 'smooth',
+    });
+  }, [activeFilter]);
+
+  useEffect(() => {
+    const portfolio = portfolioRef.current;
+    if (
+      !portfolio ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+
+    const animations = Array.from(
+      portfolio.querySelectorAll<HTMLElement>('[data-project-reveal]'),
+    ).flatMap((visual, index) => {
+      const frame = visual.querySelector<HTMLElement>('.project-frame');
+      const curtain = visual.querySelector<HTMLElement>('.project-curtain');
+      const card = visual.closest<HTMLElement>('.project-card');
+      if (!frame || !curtain || !card) return [];
+
+      const isSpotlight = card.classList.contains('project-card--spotlight');
+      const copy = card.querySelector<HTMLElement>('[data-project-copy]');
+      const direction = index % 2 === 0 ? -1 : 1;
+      const scrollSettings = {
+        target: visual,
+        enter: 'bottom 90%',
+        leave: 'top 18%',
+        sync: isSpotlight ? 0.8 : 0.45,
+      } as const;
+
+      const projectAnimations = [
+        animate(frame, {
+          x: [direction * (isSpotlight ? 110 : 44), 0],
+          y: [isSpotlight ? 64 : 36, 0],
+          scale: [isSpotlight ? 0.92 : 0.97, 1],
+          rotate: isSpotlight ? [direction * 1.5, 0] : 0,
+          ease: 'out(4)',
+          autoplay: onScroll(scrollSettings),
+        }),
+        animate(curtain, {
+          scaleX: [1, 0],
+          ease: 'inOut(3)',
+          autoplay: onScroll(scrollSettings),
+        }),
+      ];
+
+      if (isSpotlight && copy) {
+        projectAnimations.push(
+          animate(copy, {
+            x: [direction * -72, 0],
+            y: [36, 0],
+            ease: 'out(4)',
+            autoplay: onScroll(scrollSettings),
+          }),
+        );
+      }
+
+      return projectAnimations;
+    });
+
+    return () => {
+      animations.forEach((animation) => animation.revert());
+    };
+  }, [activeFilter, visibleProjects.length]);
+
+  return (
+    <div ref={portfolioRef}>
+      <div
+        className="filter-strip mb-12 flex gap-1.5 overflow-x-auto pb-2"
+        role="group"
+        aria-label="Filtrar proyectos"
+      >
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            aria-pressed={activeFilter === filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors active:translate-y-px ${
+              activeFilter === filter
+                ? 'border-ink bg-ink text-surface'
+                : 'bg-paper text-muted hover:border-line hover:text-ink border-transparent'
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      <p className="sr-only" aria-live="polite">
+        {visibleProjects.length} proyectos visibles
+      </p>
+
+      <div className="featured-projects">
+        {featuredProjects.map((project, index) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            index={index}
+            prominence={index === 0 ? 'primary' : 'featured'}
+          />
+        ))}
+      </div>
+
+      {compactProjects.length > 0 && (
+        <div className="compact-projects">
+          <div className="compact-heading border-line mb-8 flex items-end justify-between gap-6 border-t pt-8">
+            <h3 className="font-display text-2xl font-semibold">
+              Más proyectos
+            </h3>
+            <span className="text-muted font-mono text-xs">
+              {compactProjects.length} en esta selección
+            </span>
+          </div>
+          <div className="project-compact-grid grid gap-x-8 gap-y-16 lg:grid-cols-2">
+            {compactProjects.map((project, index) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                index={index + featuredProjects.length}
+                prominence="compact"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

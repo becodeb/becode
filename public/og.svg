@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f5ef"/>
+  <rect x="56" y="54" width="1088" height="522" rx="12" fill="#151515"/>
+  <rect x="56" y="54" width="14" height="522" fill="#d3311d"/>
+  <text x="112" y="166" fill="#fffdf8" font-family="Arial, sans-serif" font-size="46" font-weight="700">becode</text>
+  <text x="112" y="326" fill="#fffdf8" font-family="Arial, sans-serif" font-size="78" font-weight="700">Código que se convierte</text>
+  <text x="112" y="414" fill="#fffdf8" font-family="Arial, sans-serif" font-size="78" font-weight="700">en producto.</text>
+  <text x="112" y="504" fill="#a7a198" font-family="monospace" font-size="26">software a medida · productos web · sistemas de gestión</text>
+</svg>

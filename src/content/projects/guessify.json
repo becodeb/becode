@@ -1,0 +1,9 @@
+{
+  "name": "Guessify",
+  "url": "https://guessify.bauhub.online/achievements",
+  "description": "Juego de pistas y logros que mezcla cultura digital, desafío y progresión.",
+  "stack": ["React", "Gamificación"],
+  "category": "Experimentos",
+  "status": "En producción",
+  "order": 18
+}

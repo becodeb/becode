@@ -1,0 +1,9 @@
+{
+  "name": "Aura",
+  "url": "https://aura.becode.com.ar",
+  "description": "Una interfaz de bienestar simple, cercana y diseñada alrededor de hábitos reales.",
+  "stack": ["React", "Node.js"],
+  "category": "Productos",
+  "status": "En lanzamiento",
+  "order": 4
+}
