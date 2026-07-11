@@ -5,5 +5,6 @@
   "stack": ["Astro", "TypeScript"],
   "category": "Productos",
   "status": "En lanzamiento",
-  "order": 3
+  "order": 3,
+  "screenshot": "/screenshots/lumiere.webp"
 }

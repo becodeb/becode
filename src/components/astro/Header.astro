@@ -24,7 +24,7 @@ import logoBe from '@/assets/logo-be.png';
         />
       </span>
     </a>
-    <div class="hidden items-center gap-8 text-sm font-semibold md:flex">
+    <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
       <a class="hover:text-signal transition-colors" href="#proyectos"
         >Proyectos</a
       >
@@ -32,36 +32,41 @@ import logoBe from '@/assets/logo-be.png';
         >Servicios</a
       >
       <a class="hover:text-signal transition-colors" href="#proceso">Proceso</a>
+      <a class="hover:text-signal transition-colors" href="#equipo">Equipo</a>
       <a
         class="bg-ink text-surface hover:bg-signal rounded-[var(--radius-ui)] px-4 py-2.5 transition-colors active:translate-y-px"
         href="#contacto">Hablemos</a
       >
     </div>
-    <details class="relative md:hidden">
+    <details class="mobile-navigation md:hidden">
       <summary
-        class="border-ink flex h-10 cursor-pointer list-none items-center rounded-[var(--radius-ui)] border px-3 text-sm font-bold marker:hidden"
+        class="mobile-menu-toggle border-ink grid h-11 w-11 cursor-pointer list-none place-items-center rounded-[var(--radius-ui)] border marker:hidden"
+        title="Abrir navegación"
       >
-        Menú
+        <span class="sr-only">Abrir navegación</span>
+        <span class="menu-icon" aria-hidden="true">
+          <i></i>
+          <i></i>
+        </span>
       </summary>
       <div
-        class="border-line bg-surface shadow-window absolute top-12 right-0 flex w-52 flex-col rounded-[var(--radius-ui)] border p-2"
+        class="mobile-menu border-line bg-surface shadow-window fixed inset-x-0 top-16 border-t border-b"
       >
-        <a
-          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
-          href="#proyectos">Proyectos</a
-        >
-        <a
-          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
-          href="#servicios">Servicios</a
-        >
-        <a
-          class="hover:bg-paper rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
-          href="#proceso">Proceso</a
-        >
-        <a
-          class="bg-ink text-surface rounded-[var(--radius-ui)] px-4 py-3 font-semibold"
-          href="#contacto">Hablemos</a
-        >
+        <div class="shell py-5">
+          <p class="eyebrow text-signal mb-3">Navegación</p>
+          <div class="mobile-menu-links border-line border-t">
+            <a href="#proyectos"><span>01</span>Proyectos</a>
+            <a href="#servicios"><span>02</span>Servicios</a>
+            <a href="#proceso"><span>03</span>Proceso</a>
+            <a href="#equipo"><span>04</span>Equipo</a>
+          </div>
+          <a
+            class="bg-ink text-surface mt-5 flex items-center justify-between rounded-[var(--radius-ui)] px-5 py-4 font-bold"
+            href="#contacto"
+          >
+            Hablemos <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </div>
     </details>
   </nav>
@@ -93,11 +98,109 @@ import logoBe from '@/assets/logo-be.png';
     mix-blend-mode: multiply;
     transform: translate(-50%, -50%);
   }
+
+  .mobile-navigation[open]::before {
+    position: fixed;
+    z-index: -1;
+    inset: 4rem 0 0;
+    background: rgb(21 21 21 / 0.28);
+    content: '';
+    backdrop-filter: blur(3px);
+  }
+
+  .mobile-menu-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .menu-icon {
+    position: relative;
+    display: block;
+    width: 1.25rem;
+    height: 0.9rem;
+  }
+
+  .menu-icon i {
+    position: absolute;
+    right: 0;
+    left: 0;
+    height: 2px;
+    background: currentColor;
+    transition:
+      top 220ms ease,
+      transform 220ms ease;
+  }
+
+  .menu-icon i:first-child {
+    top: 0.15rem;
+  }
+
+  .menu-icon i:last-child {
+    top: 0.65rem;
+  }
+
+  .mobile-navigation[open] .menu-icon i:first-child {
+    top: 0.42rem;
+    transform: rotate(45deg);
+  }
+
+  .mobile-navigation[open] .menu-icon i:last-child {
+    top: 0.42rem;
+    transform: rotate(-45deg);
+  }
+
+  .mobile-menu {
+    max-height: calc(100dvh - 4rem);
+    overflow-y: auto;
+    animation: menu-enter 240ms both cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .mobile-menu-links a {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    align-items: center;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.9rem 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 8vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .mobile-menu-links a span {
+    color: var(--color-signal);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+
+  :global(html.menu-open) {
+    overflow: hidden;
+  }
+
+  @keyframes menu-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-0.75rem);
+    }
+  }
 </style>
 
 <script>
   const mobileNavigation =
     document.querySelector<HTMLDetailsElement>('header details');
+
+  mobileNavigation?.addEventListener('toggle', () => {
+    document.documentElement.classList.toggle(
+      'menu-open',
+      mobileNavigation.open,
+    );
+    const label = mobileNavigation.querySelector('.sr-only');
+    if (label) {
+      label.textContent = mobileNavigation.open
+        ? 'Cerrar navegación'
+        : 'Abrir navegación';
+    }
+  });
+
   mobileNavigation?.querySelectorAll('a').forEach((link) => {
     link.addEventListener('click', () => {
       mobileNavigation.open = false;
@@ -118,6 +221,12 @@ import logoBe from '@/assets/logo-be.png';
     if (event.key === 'Escape' && mobileNavigation?.open) {
       mobileNavigation.open = false;
       mobileNavigation.querySelector('summary')?.focus();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768 && mobileNavigation?.open) {
+      mobileNavigation.open = false;
     }
   });
 </script>

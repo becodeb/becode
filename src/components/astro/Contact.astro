@@ -1,28 +1,5 @@
 ---
 import ContactForm from '@/components/react/ContactForm';
-
-interface TeamMember {
-  name: string;
-  photo?: string;
-}
-
-// Para sumar la foto real de cada uno: colocar el archivo en public/team/
-// (ej. public/team/bautista.webp) y completar el campo `photo` acá abajo.
-const team: TeamMember[] = [
-  { name: 'Bautista Goñi' },
-  { name: 'Ezequiel Mastropietro' },
-  { name: 'Ezequiel Fernandez Cruz' },
-];
-
-function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter((word) => word.length > 0)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase();
-}
 ---
 
 <section
@@ -46,34 +23,6 @@ function initials(name: string): string {
         >
           hola@becode.com.ar
         </a>
-      </div>
-      <div class="mt-12">
-        <p class="text-muted text-sm">Con quién vas a hablar</p>
-        <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-4">
-          {
-            team.map((person) => (
-              <li class="flex items-center gap-3">
-                {person.photo ? (
-                  <img
-                    src={person.photo}
-                    alt={person.name}
-                    width={44}
-                    height={44}
-                    class="h-11 w-11 rounded-full object-cover"
-                  />
-                ) : (
-                  <span
-                    class="border-ink font-display grid h-11 w-11 shrink-0 place-items-center rounded-full border text-sm font-bold"
-                    aria-hidden="true"
-                  >
-                    {initials(person.name)}
-                  </span>
-                )}
-                <span class="text-sm font-semibold">{person.name}</span>
-              </li>
-            ))
-          }
-        </ul>
       </div>
     </div>
     <div

@@ -1,0 +1,79 @@
+---
+interface TeamMember {
+  name: string;
+}
+
+const team: TeamMember[] = [
+  { name: 'Bautista Goñi' },
+  { name: 'Ezequiel Mastropietro' },
+  { name: 'Ezequiel Fernandez Cruz' },
+];
+---
+
+<section
+  id="equipo"
+  data-scan
+  class="section-space border-line bg-paper border-t"
+>
+  <div class="shell">
+    <div
+      class="reveal mb-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end"
+    >
+      <div>
+        <p class="eyebrow text-signal mb-5">Quiénes somos</p>
+        <h2 class="section-title">El equipo detrás del código.</h2>
+      </div>
+      <p class="text-muted max-w-2xl text-lg leading-8 lg:justify-self-end">
+        Diseñamos, discutimos y programamos cada producto de punta a punta. Las
+        decisiones importantes no pasan por capas: las toma el equipo que hace
+        el trabajo.
+      </p>
+    </div>
+
+    <ol class="reveal team-list border-line mt-12 grid border-t md:grid-cols-3">
+      {
+        team.map((person, index) => (
+          <li class="border-line flex items-baseline gap-5 py-6 md:border-r md:px-6 md:first:pl-0 md:last:border-r-0">
+            <span class="text-signal font-mono text-xs">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="font-display text-xl font-semibold sm:text-2xl">
+              {person.name}
+            </h3>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 47.99rem) {
+    .team-list li + li {
+      border-top: 1px solid var(--color-line);
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .team-list li {
+      animation: team-member-in both cubic-bezier(0.2, 0.75, 0.25, 1);
+      animation-range: entry 0% entry 35%;
+      animation-timeline: view();
+    }
+
+    .team-list li:nth-child(2) {
+      animation-range: entry 6% entry 41%;
+    }
+
+    .team-list li:nth-child(3) {
+      animation-range: entry 12% entry 47%;
+    }
+  }
+
+  @keyframes team-member-in {
+    from {
+      opacity: 0.15;
+      transform: translateY(1.5rem);
+    }
+  }
+</style>

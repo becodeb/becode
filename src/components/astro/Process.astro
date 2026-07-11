@@ -34,7 +34,7 @@ const steps = [
       </p>
     </div>
     <ol
-      class="reveal bg-dim/30 mt-16 grid gap-px overflow-hidden rounded-[var(--radius-ui)] md:grid-cols-2 xl:grid-cols-4"
+      class="reveal bg-dim/30 mt-12 grid gap-px overflow-hidden rounded-[var(--radius-ui)] md:grid-cols-2 xl:grid-cols-4"
     >
       {
         steps.map((step, index) => (
@@ -43,7 +43,7 @@ const steps = [
               0{index + 1}
             </span>
             <code>{step.command}</code>
-            <h3 class="font-display mt-16 text-3xl font-semibold">
+            <h3 class="font-display mt-10 text-3xl font-semibold">
               {step.title}
             </h3>
             <p class="text-dim mt-4 text-sm leading-6">{step.text}</p>

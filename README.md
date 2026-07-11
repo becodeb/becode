@@ -65,7 +65,7 @@ El server Node standalone escucha en `HOST`/`PORT` (por defecto `0.0.0.0:4321`).
 En producción conviene:
 
 1. Mantenerlo vivo con un process manager (`pm2 start dist/server/entry.mjs
-   --name becode`) para que se reinicie solo ante caídas o reboots.
+--name becode`) para que se reinicie solo ante caídas o reboots.
 2. Ponerlo detrás de Nginx como reverse proxy (TLS, dominio, gzip) apuntando al
    puerto del proceso Node.
 3. Cargar las variables de entorno del paso anterior (`OPENAI_API_KEY`,

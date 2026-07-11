@@ -11,6 +11,9 @@ gestión y plataformas educativas a medida. Trabajamos con equipos y organizacio
 que necesitan que una operación real (no una idea abstracta) funcione mejor con
 software claro.
 
+El equipo está formado por Bautista Goñi, Ezequiel Mastropietro y Ezequiel
+Fernandez Cruz. Diseñan, discuten y programan cada producto de punta a punta.
+
 No somos una agencia de tickets ni una fábrica de features: entramos en los
 proyectos donde el software puede cambiar una operación de verdad, entendemos el
 problema a fondo y construimos con método.

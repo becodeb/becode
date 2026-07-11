@@ -2,10 +2,7 @@
   "name": "MasGestión",
   "url": "https://masgestion.mastropietro.com.ar",
   "description": "Operación comercial centralizada para gestionar clientes, tareas y seguimiento diario.",
-  "stack": [
-    "React",
-    "PostgreSQL"
-  ],
+  "stack": ["React", "PostgreSQL"],
   "category": "Gestión",
   "status": "En producción",
   "order": 14,

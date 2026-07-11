@@ -74,26 +74,38 @@ function ProjectCard({ project, index, prominence }: ProjectCardProps) {
 
       <div className="project-copy" data-project-copy>
         {isFeatured && (
-          <div className="flex items-center justify-end gap-4">
+          <div className="project-meta flex items-center justify-between gap-4">
             <span className="project-index text-muted font-mono text-xs">
               {String(index + 1).padStart(2, '0')} / 03
             </span>
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noreferrer"
+              className="project-arrow border-ink hover:bg-ink hover:text-surface grid shrink-0 place-items-center rounded-[var(--radius-ui)] border font-bold transition-colors"
+              aria-label={`Abrir ${project.name} en una pestaña nueva`}
+              title="Abrir proyecto"
+            >
+              ↗
+            </a>
           </div>
         )}
-        <div className="mt-2 flex items-start justify-between gap-4">
+        <div className="project-heading mt-2 flex min-w-0 items-start justify-between gap-4">
           <h3 className="project-name font-display font-semibold">
             {project.name}
           </h3>
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noreferrer"
-            className="project-arrow border-ink hover:bg-ink hover:text-surface grid shrink-0 place-items-center rounded-[var(--radius-ui)] border font-bold transition-colors"
-            aria-label={`Abrir ${project.name} en una pestaña nueva`}
-            title="Abrir proyecto"
-          >
-            ↗
-          </a>
+          {!isFeatured && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noreferrer"
+              className="project-arrow border-ink hover:bg-ink hover:text-surface grid shrink-0 place-items-center rounded-[var(--radius-ui)] border font-bold transition-colors"
+              aria-label={`Abrir ${project.name} en una pestaña nueva`}
+              title="Abrir proyecto"
+            >
+              ↗
+            </a>
+          )}
         </div>
         <p className="project-description text-muted mt-3 leading-6">
           {project.description}
@@ -174,19 +186,20 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       const isSpotlight = card.classList.contains('project-card--spotlight');
       const copy = card.querySelector<HTMLElement>('[data-project-copy]');
       const direction = index % 2 === 0 ? -1 : 1;
+      const useLateralMotion = window.matchMedia('(min-width: 64rem)').matches;
       const scrollSettings = {
         target: visual,
-        enter: 'bottom 95%',
-        leave: 'top 55%',
+        enter: 'bottom top',
+        leave: '35% top',
         sync: isSpotlight ? 'out(3)' : 'out(2)',
       } as const;
 
       const projectAnimations = [
         animate(frame, {
-          x: [direction * (isSpotlight ? 110 : 44), 0],
-          y: [isSpotlight ? 64 : 36, 0],
-          scale: [isSpotlight ? 0.92 : 0.97, 1],
-          rotate: isSpotlight ? [direction * 1.5, 0] : 0,
+          x: [direction * (isSpotlight ? 48 : 32), 0],
+          y: [isSpotlight ? 36 : 26, 0],
+          scale: [isSpotlight ? 0.96 : 0.98, 1],
+          rotate: isSpotlight ? [direction * 0.65, 0] : 0,
           ease: 'out(4)',
           autoplay: onScroll(scrollSettings),
         }),
@@ -200,8 +213,8 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       if (isSpotlight && copy) {
         projectAnimations.push(
           animate(copy, {
-            x: [direction * -72, 0],
-            y: [36, 0],
+            x: useLateralMotion ? [direction * -34, 0] : 0,
+            y: [18, 0],
             ease: 'out(4)',
             autoplay: onScroll(scrollSettings),
           }),
@@ -255,15 +268,37 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
         ))}
       </div>
 
-      {compactProjects.length > 0 && !showAllProjects && (
-        <div className="mt-16 flex justify-center border-t border-line pt-16">
-          <button
-            type="button"
-            onClick={() => setShowAllProjects(true)}
-            className="border-ink hover:bg-ink hover:text-surface rounded-[var(--radius-ui)] border px-6 py-3.5 font-bold transition-colors active:translate-y-px"
-          >
-            Ver los {compactProjects.length} proyectos restantes
-          </button>
+      {compactProjects.length > 0 && (
+        <div className="project-outro border-line mt-20 border-t pt-12 sm:mt-24 sm:pt-14">
+          <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-8">
+            <div>
+              <p className="eyebrow text-signal mb-4">Siguiente paso</p>
+              <h3 className="font-display text-3xl font-semibold sm:text-4xl">
+                ¿Viste suficiente?
+              </h3>
+              <p className="text-muted mt-4 max-w-md leading-7">
+                Hay muchos otros proyectos para recorrer. Podés seguir mirando o
+                vamos directo a hablar del tuyo.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {!showAllProjects && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllProjects(true)}
+                  className="border-ink hover:bg-ink hover:text-surface rounded-[var(--radius-ui)] border px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+                >
+                  Ver otros proyectos
+                </button>
+              )}
+              <a
+                href="#contacto"
+                className="bg-signal text-surface hover:bg-signal-dark rounded-[var(--radius-ui)] px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+              >
+                Sí, hablemos <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
         </div>
       )}
 
@@ -274,7 +309,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
               Más proyectos
             </h3>
             <span className="text-muted font-mono text-xs">
-              {compactProjects.length} en esta selección
+              Selección ampliada
             </span>
           </div>
           <div className="project-compact-grid grid gap-x-8 gap-y-16 lg:grid-cols-2">

@@ -44,7 +44,7 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
 
   .featured-projects {
     display: grid;
-    gap: clamp(7rem, 15vw, 13rem);
+    gap: clamp(4.5rem, 9vw, 8rem);
   }
 
   .project-card--spotlight {
@@ -74,7 +74,7 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
   }
 
   .project-card--spotlight .project-name {
-    font-size: clamp(2.75rem, 7vw, 5rem);
+    font-size: clamp(3rem, 8vw, 7.5rem);
   }
 
   .project-card--compact .project-name {
@@ -87,8 +87,9 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
   }
 
   .project-card--spotlight .project-description {
-    font-size: 1rem;
-    line-height: 1.75;
+    max-width: 58ch;
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    line-height: 1.7;
   }
 
   .project-stack {
@@ -156,7 +157,7 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
   }
 
   .compact-projects {
-    margin-top: clamp(8rem, 15vw, 14rem);
+    margin-top: clamp(4rem, 8vw, 6rem);
   }
 
   .project-placeholder {
@@ -371,20 +372,19 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
 
   @media (min-width: 64rem) {
     .featured-projects {
-      gap: clamp(10rem, 18vh, 14rem);
+      gap: clamp(6rem, 12vh, 9rem);
     }
 
     .project-card--spotlight {
       display: grid;
-      min-height: min(52rem, calc(100dvh - 5rem));
-      grid-template-columns: minmax(0, 1.75fr) minmax(17rem, 0.55fr);
+      grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.75fr);
       align-items: center;
-      gap: clamp(2rem, 4vw, 4.5rem);
+      gap: clamp(2.5rem, 5vw, 5rem);
       padding-bottom: clamp(2rem, 4vw, 4rem);
     }
 
     .project-card--spotlight:nth-child(even) {
-      grid-template-columns: minmax(17rem, 0.55fr) minmax(0, 1.75fr);
+      grid-template-columns: minmax(20rem, 0.75fr) minmax(0, 1.45fr);
     }
 
     .project-card--spotlight:nth-child(even) .project-visual {
@@ -398,16 +398,35 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
     }
 
     .project-card--spotlight .project-frame {
-      height: clamp(30rem, 68vh, 46rem);
+      height: clamp(28rem, 68vh, 44rem);
       aspect-ratio: auto;
     }
 
     .project-card--spotlight .project-copy {
+      min-width: 0;
       margin-top: 0;
     }
 
     .project-card--spotlight .project-name {
-      font-size: clamp(3rem, 4.4vw, 5rem);
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      font-size: clamp(3rem, 4.8vw, 4.75rem);
+      line-height: 0.92;
+    }
+
+    .project-card--spotlight .project-heading {
+      display: block;
+      margin-top: 1rem;
+    }
+
+    .project-card--spotlight .project-arrow {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .project-card--spotlight .project-description {
+      margin-top: 1.5rem;
     }
   }
 
@@ -428,7 +447,7 @@ const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
   @supports (animation-timeline: view()) {
     .project-card--spotlight::before {
       animation: project-line linear both;
-      animation-range: entry 10% cover 55%;
+      animation-range: entry 0% cover 30%;
       animation-timeline: view();
     }
   }

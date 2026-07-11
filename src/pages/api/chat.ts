@@ -74,7 +74,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   if (isRateLimited(rateLimitKey)) {
     return new Response(
-      JSON.stringify({ error: 'Demasiadas consultas. Probá de nuevo en unos minutos.' }),
+      JSON.stringify({
+        error: 'Demasiadas consultas. Probá de nuevo en unos minutos.',
+      }),
       { status: 429, headers: { 'Content-Type': 'application/json' } },
     );
   }
@@ -82,7 +84,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (!OPENAI_API_KEY) {
     console.error('OPENAI_API_KEY no está configurada.');
     return new Response(
-      JSON.stringify({ error: 'El asistente no está disponible en este momento.' }),
+      JSON.stringify({
+        error: 'El asistente no está disponible en este momento.',
+      }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     );
   }
@@ -126,7 +130,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const errorBody = await response.text();
       console.error('Error de OpenAI:', response.status, errorBody);
       return new Response(
-        JSON.stringify({ error: 'No pudimos generar una respuesta. Probá de nuevo.' }),
+        JSON.stringify({
+          error: 'No pudimos generar una respuesta. Probá de nuevo.',
+        }),
         { status: 502, headers: { 'Content-Type': 'application/json' } },
       );
     }
@@ -138,7 +144,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     if (!reply) {
       return new Response(
-        JSON.stringify({ error: 'No pudimos generar una respuesta. Probá de nuevo.' }),
+        JSON.stringify({
+          error: 'No pudimos generar una respuesta. Probá de nuevo.',
+        }),
         { status: 502, headers: { 'Content-Type': 'application/json' } },
       );
     }
@@ -150,7 +158,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   } catch (error) {
     console.error('Error llamando a OpenAI:', error);
     return new Response(
-      JSON.stringify({ error: 'No pudimos generar una respuesta. Probá de nuevo.' }),
+      JSON.stringify({
+        error: 'No pudimos generar una respuesta. Probá de nuevo.',
+      }),
       { status: 502, headers: { 'Content-Type': 'application/json' } },
     );
   }
