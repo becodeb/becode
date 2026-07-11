@@ -20,6 +20,17 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/.astro/**',
+          '**/dist/**',
+          '**/*.log',
+        ],
+      },
+    },
   },
   env: {
     schema: {
