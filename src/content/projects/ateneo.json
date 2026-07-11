@@ -1,9 +1,0 @@
-{
-  "name": "Ateneo",
-  "url": "https://ateneo.becode.com.ar",
-  "description": "Herramientas claras para organizar conocimiento, comunidad y experiencias de aprendizaje.",
-  "stack": ["React", "TypeScript"],
-  "category": "Productos",
-  "status": "En lanzamiento",
-  "order": 4
-}

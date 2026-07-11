@@ -1,9 +1,0 @@
-{
-  "name": "Meche",
-  "url": "https://meche.becode.com.ar",
-  "description": "Gestión ágil para equipos que necesitan ordenar el trabajo sin sumar fricción.",
-  "stack": ["React", "Supabase"],
-  "category": "Productos",
-  "status": "En lanzamiento",
-  "order": 7
-}
