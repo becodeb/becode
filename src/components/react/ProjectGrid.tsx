@@ -175,17 +175,16 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       const copy = card.querySelector<HTMLElement>('[data-project-copy]');
       const direction = index % 2 === 0 ? -1 : 1;
       const scrollSettings = {
-        target: visual,
-        enter: 'bottom 95%',
-        leave: 'top 55%',
-        sync: isSpotlight ? 'out(3)' : 'out(2)',
+        target: frame,
+        enter: 'bottom top',
+        leave: '85% 100%',
+        sync: 1,
       } as const;
 
       const projectAnimations = [
         animate(frame, {
           x: [direction * (isSpotlight ? 110 : 44), 0],
-          y: [isSpotlight ? 64 : 36, 0],
-          scale: [isSpotlight ? 0.92 : 0.97, 1],
+          scaleX: [isSpotlight ? 0.92 : 0.97, 1],
           rotate: isSpotlight ? [direction * 1.5, 0] : 0,
           ease: 'out(4)',
           autoplay: onScroll(scrollSettings),
