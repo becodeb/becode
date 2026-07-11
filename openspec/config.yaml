@@ -1,0 +1,50 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Astro v5 + React v19 + TypeScript (strictest) + Node adapter (standalone)
+  Architecture: Hybrid Astro (server) + React (interactive) components with content collections
+  Styling: Tailwind CSS v4 (Vite plugin)
+  Content: Astro content collections with Zod validation (projects portfolio)
+  API: Server endpoint at /api/chat (OpenAI integration)
+  Testing: Not configured (no test runner found)
+  Build: astro check && astro build
+  Format: Prettier v3 with Astro + Tailwind plugins
+  Lint: ESLint v9 with typescript-eslint + react-hooks
+
+strict_tdd: false
+
+testing:
+  strict_tdd: false
+  runner: null
+  explanation: No test runner or test files detected in project. Consider installing vitest for unit/component testing and @astrojs/check covers type checking.
+  layers:
+    unit: { available: false, tool: null }
+    integration: { available: false, tool: null }
+    e2e: { available: false, tool: null }
+  coverage: { available: false, command: null }
+  quality:
+    linter: { available: true, command: 'eslint .' }
+    type_checker: { available: true, command: 'astro check' }
+    formatter: { available: true, command: 'prettier --write .' }
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Scope changes to fit single implementation session
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: false
+    test_command: ''
+  verify:
+    test_command: ''
+    build_command: 'npm run build'
+    coverage_threshold: 0

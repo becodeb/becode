@@ -188,17 +188,16 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       const direction = index % 2 === 0 ? -1 : 1;
       const useLateralMotion = window.matchMedia('(min-width: 64rem)').matches;
       const scrollSettings = {
-        target: visual,
+        target: frame,
         enter: 'bottom top',
-        leave: '35% top',
-        sync: isSpotlight ? 'out(3)' : 'out(2)',
+        leave: '85% 100%',
+        sync: 1,
       } as const;
 
       const projectAnimations = [
         animate(frame, {
           x: [direction * (isSpotlight ? 48 : 32), 0],
-          y: [isSpotlight ? 36 : 26, 0],
-          scale: [isSpotlight ? 0.96 : 0.98, 1],
+          scaleX: [isSpotlight ? 0.96 : 0.98, 1],
           rotate: isSpotlight ? [direction * 0.65, 0] : 0,
           ease: 'out(4)',
           autoplay: onScroll(scrollSettings),
