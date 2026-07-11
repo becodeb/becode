@@ -73,16 +73,13 @@ function ProjectCard({ project, index, prominence }: ProjectCardProps) {
       </a>
 
       <div className="project-copy" data-project-copy>
-        <div className="flex items-center justify-between gap-4">
-          <p className="project-status text-signal font-mono font-semibold uppercase">
-            {project.status}
-          </p>
-          {isFeatured && (
+        {isFeatured && (
+          <div className="flex items-center justify-end gap-4">
             <span className="project-index text-muted font-mono text-xs">
               {String(index + 1).padStart(2, '0')} / 03
             </span>
-          )}
-        </div>
+          </div>
+        )}
         <div className="mt-2 flex items-start justify-between gap-4">
           <h3 className="project-name font-display font-semibold">
             {project.name}
@@ -123,6 +120,7 @@ function ProjectCard({ project, index, prominence }: ProjectCardProps) {
 
 export default function ProjectGrid({ projects }: ProjectGridProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('Todos');
+  const [showAllProjects, setShowAllProjects] = useState(false);
   const portfolioRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
@@ -143,6 +141,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       return;
     }
 
+    setShowAllProjects(false);
     const portfolio = portfolioRef.current;
     if (!portfolio) return;
     const top = portfolio.getBoundingClientRect().top + window.scrollY - 80;
@@ -177,9 +176,9 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       const direction = index % 2 === 0 ? -1 : 1;
       const scrollSettings = {
         target: visual,
-        enter: 'bottom 90%',
-        leave: 'top 18%',
-        sync: isSpotlight ? 0.8 : 0.45,
+        enter: 'bottom 95%',
+        leave: 'top 55%',
+        sync: isSpotlight ? 'out(3)' : 'out(2)',
       } as const;
 
       const projectAnimations = [
@@ -215,7 +214,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
     return () => {
       animations.forEach((animation) => animation.revert());
     };
-  }, [activeFilter, visibleProjects.length]);
+  }, [activeFilter, visibleProjects.length, showAllProjects]);
 
   return (
     <div ref={portfolioRef}>
@@ -256,7 +255,19 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
         ))}
       </div>
 
-      {compactProjects.length > 0 && (
+      {compactProjects.length > 0 && !showAllProjects && (
+        <div className="mt-16 flex justify-center border-t border-line pt-16">
+          <button
+            type="button"
+            onClick={() => setShowAllProjects(true)}
+            className="border-ink hover:bg-ink hover:text-surface rounded-[var(--radius-ui)] border px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+          >
+            Ver los {compactProjects.length} proyectos restantes
+          </button>
+        </div>
+      )}
+
+      {compactProjects.length > 0 && showAllProjects && (
         <div className="compact-projects">
           <div className="compact-heading border-line mb-8 flex items-end justify-between gap-6 border-t pt-8">
             <h3 className="font-display text-2xl font-semibold">

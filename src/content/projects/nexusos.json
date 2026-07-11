@@ -5,5 +5,5 @@
   "stack": ["Next.js", "PostgreSQL"],
   "category": "Productos",
   "status": "En lanzamiento",
-  "order": 6
+  "order": 8
 }

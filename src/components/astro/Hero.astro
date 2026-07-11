@@ -37,34 +37,6 @@
       role="img"
       aria-label="Una especificación de producto convirtiéndose en una interfaz"
     >
-      <div class="compiler-spec" aria-hidden="true">
-        <p>
-          <span class="compiler-key">producto</span>
-          <span class="compiler-value" data-compiler-field="product"
-            >campus</span
-          >
-        </p>
-        <p>
-          <span class="compiler-key">usuarios</span>
-          <span class="compiler-value" data-compiler-field="users">4 roles</span
-          >
-        </p>
-        <p>
-          <span class="compiler-key">flujo</span>
-          <span class="compiler-value" data-compiler-field="flow"
-            >asistencia</span
-          >
-        </p>
-        <p>
-          <span class="compiler-key">estado</span>
-          <strong class="compiler-value" data-compiler-field="status"
-            >compilando</strong
-          >
-        </p>
-        <div class="terminal-command">
-          <span>becode@product:~$</span> deploy --watch<i></i>
-        </div>
-      </div>
       <div class="product-window">
         <div class="window-bar">
           <div class="brand-mark">b<span>/</span></div>
@@ -138,105 +110,6 @@
     background: var(--color-signal);
     content: '';
     transform: rotate(2deg);
-  }
-
-  .compiler::after {
-    position: absolute;
-    z-index: 3;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: 1px;
-    background: var(--color-signal);
-    content: '';
-    opacity: 0.45;
-    pointer-events: none;
-    animation: compiler-scan 3.2s 1.5s infinite cubic-bezier(0.2, 0.75, 0.25, 1);
-  }
-
-  .compiler-spec {
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    left: 0;
-    width: 16rem;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-ui);
-    background: var(--color-ink);
-    padding: 1.1rem;
-    color: var(--color-surface);
-    box-shadow: var(--shadow-window);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-  }
-
-  .compiler-spec p {
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgb(255 255 255 / 0.12);
-    opacity: 0;
-    animation: spec-in 450ms both;
-  }
-
-  .compiler-spec p:last-child {
-    border: 0;
-  }
-
-  .compiler-spec p:nth-child(1) {
-    animation-delay: 600ms;
-  }
-  .compiler-spec p:nth-child(2) {
-    animation-delay: 760ms;
-  }
-  .compiler-spec p:nth-child(3) {
-    animation-delay: 920ms;
-  }
-  .compiler-spec p:nth-child(4) {
-    animation-delay: 1080ms;
-  }
-  .compiler-key {
-    color: var(--color-dim);
-  }
-
-  .compiler-value {
-    color: var(--color-surface);
-    transition:
-      opacity 120ms ease,
-      transform 120ms ease;
-  }
-
-  .compiler-value.is-updating {
-    opacity: 0.2;
-    transform: translateX(0.35rem);
-  }
-
-  .compiler-spec strong.compiler-value {
-    color: var(--color-signal);
-  }
-
-  .terminal-command {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.45rem;
-    padding-top: 0.7rem;
-    border-top: 1px solid rgb(255 255 255 / 0.12);
-    color: var(--color-dim);
-    font-size: 0.62rem;
-    white-space: nowrap;
-  }
-
-  .terminal-command span {
-    color: var(--color-signal);
-  }
-
-  .terminal-command i {
-    width: 0.45rem;
-    height: 0.85rem;
-    background: var(--color-surface);
-    animation: terminal-caret 800ms steps(1) infinite;
   }
 
   .product-window {
@@ -404,52 +277,10 @@
       transform: translateY(1.25rem);
     }
   }
-  @keyframes spec-in {
-    from {
-      opacity: 0;
-      transform: translateX(-0.75rem);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
   @keyframes product-in {
     to {
       opacity: 1;
       transform: none;
-    }
-  }
-
-  @keyframes compiler-scan {
-    from {
-      transform: translateY(1rem);
-    }
-    to {
-      transform: translateY(31rem);
-    }
-  }
-
-  @keyframes terminal-caret {
-    50% {
-      opacity: 0;
-    }
-  }
-
-  @keyframes terminal-drift {
-    from {
-      translate: 0 1.5rem;
-    }
-    to {
-      translate: 0 -2rem;
-    }
-  }
-
-  @supports (animation-timeline: view()) {
-    .compiler-spec {
-      animation: terminal-drift linear both;
-      animation-range: cover 0% cover 100%;
-      animation-timeline: view();
     }
   }
 
@@ -465,15 +296,6 @@
   @media (max-width: 37.5rem) {
     .compiler {
       min-height: 20rem;
-    }
-    .compiler-spec {
-      width: 12.5rem;
-      padding: 0.75rem;
-      font-size: 0.59rem;
-    }
-    .terminal-command {
-      gap: 0.25rem;
-      font-size: 0.48rem;
     }
     .product-window {
       bottom: 1rem;
@@ -525,73 +347,3 @@
   }
 </style>
 
-<script>
-  const hero = document.querySelector<HTMLElement>('#inicio');
-  const terminal = hero?.querySelector<HTMLElement>('.compiler-spec');
-  const reducedMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)',
-  ).matches;
-
-  const terminalStates = [
-    {
-      product: 'campus',
-      users: '4 roles',
-      flow: 'asistencia',
-      status: 'compilando',
-    },
-    {
-      product: 'inventario',
-      users: '1.248 activos',
-      flow: 'préstamos',
-      status: 'sincronizando',
-    },
-    {
-      product: 'horarios',
-      users: '37 sedes',
-      flow: 'optimización',
-      status: 'validando',
-    },
-    {
-      product: 'check-in',
-      users: '842 hoy',
-      flow: 'accesos',
-      status: 'desplegado',
-    },
-  ] as const;
-
-  let terminalStateIndex = 0;
-  let terminalTimer: number | undefined;
-
-  const cycleTerminal = () => {
-    terminalStateIndex = (terminalStateIndex + 1) % terminalStates.length;
-    const nextState = terminalStates[terminalStateIndex];
-    if (!nextState) return;
-
-    for (const [key, value] of Object.entries(nextState)) {
-      const field = terminal?.querySelector<HTMLElement>(
-        `[data-compiler-field="${key}"]`,
-      );
-      if (!field) continue;
-      field.classList.add('is-updating');
-      window.setTimeout(() => {
-        field.textContent = value;
-        field.classList.remove('is-updating');
-      }, 120);
-    }
-  };
-
-  if (terminal && !reducedMotion) {
-    const terminalObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting && terminalTimer === undefined) {
-          terminalTimer = window.setInterval(cycleTerminal, 2600);
-        } else if (!entry?.isIntersecting && terminalTimer !== undefined) {
-          window.clearInterval(terminalTimer);
-          terminalTimer = undefined;
-        }
-      },
-      { threshold: 0.2 },
-    );
-    terminalObserver.observe(terminal);
-  }
-</script>

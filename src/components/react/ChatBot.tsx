@@ -11,7 +11,7 @@ const GREETING: ChatMessage = {
   id: 'greeting',
   role: 'assistant',
   content:
-    'Hola. Soy el asistente de becode. Preguntame qué hacemos, cómo trabajamos o sobre nuestros proyectos.',
+    'Hola, soy un asistente virtual con IA de becode. Puedo responderte automáticamente sobre qué hacemos, cómo trabajamos o nuestros proyectos.',
 };
 
 const MAX_HISTORY = 16;
@@ -97,15 +97,36 @@ export default function ChatBot() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Asistente de becode"
+          aria-label="Asistente con IA de becode"
           className="border-ink bg-paper shadow-window fixed inset-x-3 top-[4.5rem] bottom-3 flex flex-col overflow-hidden rounded-[var(--radius-ui)] border sm:inset-auto sm:top-auto sm:right-0 sm:bottom-20 sm:h-[34rem] sm:w-96"
         >
           <div className="bg-ink text-surface flex items-center justify-between px-5 py-4">
-            <div>
-              <p className="font-display text-base font-semibold">
-                be<span className="text-signal">/</span>code
-              </p>
-              <p className="text-dim text-xs">Asistente del sitio</p>
+            <div className="flex items-center gap-3">
+              <span
+                className="bg-signal grid h-9 w-9 shrink-0 place-items-center rounded-full"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                  <path
+                    d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3Z"
+                    fill="currentColor"
+                    className="text-surface"
+                  />
+                  <path
+                    d="M19 14l.9 2.2L22 17l-2.1.8L19 20l-.9-2.2L16 17l2.1-.8L19 14Z"
+                    fill="currentColor"
+                    className="text-surface"
+                  />
+                </svg>
+              </span>
+              <div>
+                <p className="font-display text-base font-semibold">
+                  Asistente con IA
+                </p>
+                <p className="text-dim text-xs">
+                  Respuestas automáticas sobre becode
+                </p>
+              </div>
             </div>
             <button
               type="button"
@@ -131,25 +152,59 @@ export default function ChatBot() {
             aria-live="polite"
             className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
           >
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={
-                  message.role === 'user'
-                    ? 'ml-auto max-w-[85%] rounded-[var(--radius-ui)] bg-ink px-4 py-2.5 text-sm text-surface'
-                    : message.role === 'error'
-                      ? 'text-signal max-w-[85%] rounded-[var(--radius-ui)] border border-signal/30 bg-surface px-4 py-2.5 text-sm'
-                      : 'max-w-[85%] rounded-[var(--radius-ui)] border border-line bg-surface px-4 py-2.5 text-sm text-ink'
-                }
-              >
-                {message.content}
-              </div>
-            ))}
+            {messages.map((message) =>
+              message.role === 'user' ? (
+                <div
+                  key={message.id}
+                  className="ml-auto max-w-[85%] rounded-[var(--radius-ui)] bg-ink px-4 py-2.5 text-sm text-surface"
+                >
+                  {message.content}
+                </div>
+              ) : (
+                <div key={message.id} className="flex items-start gap-2">
+                  <span
+                    className="bg-ink grid h-6 w-6 shrink-0 place-items-center rounded-full"
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 24 24" width="12" height="12">
+                      <path
+                        d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3Z"
+                        fill="currentColor"
+                        className="text-signal"
+                      />
+                    </svg>
+                  </span>
+                  <div
+                    className={
+                      message.role === 'error'
+                        ? 'text-signal max-w-[85%] rounded-[var(--radius-ui)] border border-signal/30 bg-surface px-4 py-2.5 text-sm'
+                        : 'max-w-[85%] rounded-[var(--radius-ui)] border border-line bg-surface px-4 py-2.5 text-sm text-ink'
+                    }
+                  >
+                    {message.content}
+                  </div>
+                </div>
+              ),
+            )}
             {loading && (
-              <div className="border-line bg-surface flex w-fit gap-1.5 rounded-[var(--radius-ui)] border px-4 py-3">
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-dot" />
+              <div className="flex items-start gap-2">
+                <span
+                  className="bg-ink grid h-6 w-6 shrink-0 place-items-center rounded-full"
+                  aria-hidden="true"
+                >
+                  <svg viewBox="0 0 24 24" width="12" height="12">
+                    <path
+                      d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4L12 3Z"
+                      fill="currentColor"
+                      className="text-signal"
+                    />
+                  </svg>
+                </span>
+                <div className="border-line bg-surface flex w-fit gap-1.5 rounded-[var(--radius-ui)] border px-4 py-3">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                </div>
               </div>
             )}
           </div>
@@ -194,7 +249,9 @@ export default function ChatBot() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        aria-label={open ? 'Cerrar el asistente' : 'Abrir el asistente de becode'}
+        aria-label={
+          open ? 'Cerrar el asistente' : 'Abrir el asistente con IA de becode'
+        }
         className="bg-ink text-surface shadow-window hover:bg-signal grid h-14 w-14 place-items-center rounded-full transition-colors"
       >
         {open ? (
