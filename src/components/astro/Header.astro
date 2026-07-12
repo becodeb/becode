@@ -23,6 +23,7 @@ import logoBe from '@/assets/logo-be.png';
           class="brand-symbol-image"
         />
       </span>
+      <span class="header-brand-text">be<span class="text-signal">/</span>code</span>
     </a>
     <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
       <a class="hover:text-signal transition-colors" href="#proyectos"
@@ -180,6 +181,28 @@ import logoBe from '@/assets/logo-be.png';
     from {
       opacity: 0;
       transform: translateY(-0.75rem);
+    }
+  }
+
+  .header-brand-text {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .header-brand-text {
+      animation: brand-fade-in linear both;
+      animation-timeline: scroll(root);
+      animation-range: entry 0% entry 5%;
+    }
+  }
+
+  @keyframes brand-fade-in {
+    to {
+      opacity: 1;
     }
   }
 </style>
