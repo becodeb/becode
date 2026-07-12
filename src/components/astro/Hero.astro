@@ -1,3 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import HeroShowcase from '@/components/react/HeroShowcase';
+
+export interface Props {
+  projects: CollectionEntry<'projects'>[];
+}
+
+const { projects } = Astro.props;
+const showcaseProjects = projects.flatMap(({ id, data }) =>
+  data.screenshot
+    ? [
+        {
+          id,
+          name: data.name,
+          category: data.category,
+          screenshot: data.screenshot,
+        },
+      ]
+    : [],
+);
+---
+
 <section
   id="inicio"
   class="relative flex min-h-[calc(100dvh-2.5rem)] items-center overflow-hidden pt-20 pb-2 sm:pb-12"
@@ -32,61 +55,9 @@
       </div>
     </div>
 
-    <div
-      class="compiler"
-      role="img"
-      aria-label="Una especificación de producto convirtiéndose en una interfaz"
-    >
-      <div class="product-window">
-        <div class="window-bar">
-          <div class="brand-mark">b<span>/</span></div>
-          <span>product.build / v0.8</span>
-          <span class="live-state">Compilando</span>
-        </div>
-        <div class="window-body">
-          <aside>
-            <span class="nav-active">Resumen</span>
-            <span>Flujos</span>
-            <span>Interfaz</span>
-            <span>Releases</span>
-          </aside>
-          <div class="dashboard">
-            <div class="dash-heading">
-              <div>
-                <small>Sprint 08 · release candidate</small>
-                <h2>Lista para validar.</h2>
-              </div>
-              <span class="mock-button">Publicar versión</span>
-            </div>
-            <div class="metric-row">
-              <article>
-                <strong data-count="12">12</strong><span>Módulos listos</span>
-              </article>
-              <article>
-                <strong data-count="4">4</strong><span>Flujos validados</span>
-              </article>
-              <article>
-                <strong data-count="98" data-suffix="%">98%</strong><span
-                  >Checks OK</span
-                >
-              </article>
-            </div>
-            <div class="activity">
-              <div class="activity-head">
-                <strong>Últimos cambios</strong><span>En curso</span>
-              </div>
-              <div class="activity-row">
-                <i></i><span>Permisos y roles</span><small>Listo</small>
-              </div>
-              <div class="activity-row">
-                <i></i><span>Flujo principal</span><small>Validado</small>
-              </div>
-              <div class="activity-row">
-                <i></i><span>Release candidata</span><small>En QA</small>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div class="compiler" aria-label="Vistas previas de proyectos de becode">
+      <div class="showcase-slot">
+        <HeroShowcase client:load projects={showcaseProjects} />
       </div>
     </div>
   </div>
@@ -103,172 +74,25 @@
     animation: hero-in 800ms 260ms both cubic-bezier(0.2, 0.75, 0.25, 1);
   }
 
-  .compiler::before {
-    position: absolute;
-    inset: 8% 3% 2% 12%;
-    border-radius: var(--radius-ui);
-    background: var(--color-signal);
-    content: '';
-    transform: rotate(2deg);
-  }
-
-  .product-window {
+  .showcase-slot {
     position: absolute;
     z-index: 1;
     right: 0;
     bottom: 1.5rem;
     width: 91%;
-    overflow: hidden;
-    border: 1px solid var(--color-ink);
-    border-radius: var(--radius-ui);
-    background: var(--color-surface);
-    box-shadow: var(--shadow-window);
     opacity: 0;
     transform: translateY(1.5rem) scale(0.97);
     animation: product-in 600ms 520ms forwards cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .window-bar {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.75rem;
-    height: 3.5rem;
-    border-bottom: 1px solid var(--color-line);
-    padding: 0 1rem;
-    font-size: 0.72rem;
-    font-weight: 700;
-  }
-
-  .brand-mark {
-    display: grid;
-    width: 1.75rem;
-    aspect-ratio: 1;
-    place-items: center;
-    border-radius: 0.2rem;
-    background: var(--color-ink);
-    color: var(--color-surface);
-  }
-
-  .brand-mark span,
-  .live-state {
-    color: var(--color-signal);
-  }
-  .live-state {
-    font-family: var(--font-mono);
-  }
-
-  .window-body {
-    display: grid;
-    grid-template-columns: 7.5rem 1fr;
-    min-height: 26rem;
-  }
-
-  .window-body aside {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    border-right: 1px solid var(--color-line);
-    padding: 1.25rem 0.75rem;
-    font-size: 0.68rem;
-    font-weight: 650;
-    color: var(--color-muted);
-  }
-
-  .window-body aside span {
-    padding: 0.55rem 0.65rem;
-  }
-  .window-body .nav-active {
-    border-radius: 0.2rem;
-    background: var(--color-ink);
-    color: var(--color-surface);
-  }
-  .dashboard {
-    min-width: 0;
-    padding: 1.5rem;
-  }
-  .dash-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .dash-heading small {
-    color: var(--color-muted);
-    font-size: 0.61rem;
-  }
-  .dash-heading h2 {
-    margin: 0.2rem 0 0;
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-  }
-  .dash-heading .mock-button {
-    border-radius: 0.2rem;
+  .showcase-slot::before {
+    position: absolute;
+    z-index: 5;
+    inset: -5.5% -3% 16% 9%;
+    border-radius: var(--radius-ui);
     background: var(--color-signal);
-    padding: 0.65rem 0.75rem;
-    color: var(--color-surface);
-    font: 700 0.62rem var(--font-body);
-  }
-  .metric-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.65rem;
-    margin-top: 1.5rem;
-  }
-  .metric-row article {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    border: 1px solid var(--color-line);
-    border-radius: 0.2rem;
-    padding: 0.8rem;
-  }
-  .metric-row strong {
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-variant-numeric: tabular-nums;
-  }
-  .metric-row span {
-    margin-top: 0.25rem;
-    overflow: hidden;
-    color: var(--color-muted);
-    font-size: 0.58rem;
-    text-overflow: ellipsis;
-  }
-  .activity {
-    margin-top: 0.75rem;
-    border: 1px solid var(--color-line);
-    border-radius: 0.2rem;
-    padding: 0.85rem;
-  }
-  .activity-head,
-  .activity-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-  }
-  .activity-head {
-    padding-bottom: 0.65rem;
-    font-size: 0.66rem;
-  }
-  .activity-head span {
-    color: var(--color-signal);
-  }
-  .activity-row {
-    grid-template-columns: auto 1fr auto;
-    gap: 0.55rem;
-    border-top: 1px solid var(--color-line);
-    padding: 0.65rem 0;
-    font-size: 0.58rem;
-  }
-  .activity-row i {
-    width: 0.38rem;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--color-signal);
-  }
-  .activity-row small {
-    color: var(--color-muted);
+    content: '';
+    transform: rotate(2deg);
   }
 
   @keyframes hero-in {
@@ -288,7 +112,7 @@
     .compiler {
       min-height: 34rem;
     }
-    .product-window {
+    .showcase-slot {
       width: 92%;
     }
   }
@@ -297,52 +121,9 @@
     .compiler {
       min-height: 20rem;
     }
-    .product-window {
+    .showcase-slot {
       bottom: 1rem;
-      width: 122%;
-      scale: 0.78;
-      transform-origin: right bottom;
-    }
-    .window-body {
-      grid-template-columns: 4.4rem 1fr;
-      min-height: 16rem;
-    }
-    .window-body aside {
-      padding: 0.9rem 0.35rem;
-      font-size: 0.5rem;
-    }
-    .window-body aside span {
-      padding: 0.45rem 0.35rem;
-    }
-    .dashboard {
-      padding: 0.85rem;
-    }
-    .dash-heading h2 {
-      font-size: 0.9rem;
-    }
-    .dash-heading .mock-button {
-      padding: 0.5rem;
-      font-size: 0.48rem;
-    }
-    .metric-row {
-      gap: 0.35rem;
-      margin-top: 1rem;
-    }
-    .metric-row article {
-      padding: 0.5rem;
-    }
-    .metric-row strong {
-      font-size: 0.9rem;
-    }
-    .metric-row span {
-      font-size: 0.45rem;
-    }
-    .activity {
-      padding: 0.5rem;
-    }
-    .activity-row {
-      gap: 0.3rem;
-      font-size: 0.48rem;
+      width: 100%;
     }
   }
 </style>

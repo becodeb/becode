@@ -23,25 +23,18 @@ function createId(): string {
 function AssistantLogo({ className }: { className: string }) {
   return (
     <span
-      className={`${className} assistant-logo border-line bg-surface block shrink-0 overflow-hidden rounded-[var(--radius-ui)] border`}
+      className={`${className} border-line bg-surface block shrink-0 overflow-hidden rounded-[var(--radius-ui)] border`}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
-        <g fill="currentColor" className="text-ink">
-          <path d="M26 13 37 36H15Z" />
-          <path d="M13 43h25l6 13-5 11H7Z" />
-          <path d="M8 72h25l-6 17H0Z" />
-          <path d="M67 12h19v24H67Z" />
-          <path d="M67 43h19L74 56l12 12H67L55 56Z" />
-          <path d="M67 72h19v17H67Z" />
-          <path d="m55 74 8 15H48Z" />
-        </g>
-        <path
-          d="M47 12h14L40 89H26Z"
-          fill="currentColor"
-          className="text-signal"
-        />
-      </svg>
+      <img
+        src="/assistant-logo.png"
+        alt=""
+        width={192}
+        height={192}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
     </span>
   );
 }

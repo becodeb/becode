@@ -190,8 +190,6 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
       const scrollSettings = {
         target: frame,
         enter: 'bottom top',
-        leave: '85% 100%',
-        sync: 1,
       } as const;
 
       const projectAnimations = [
@@ -199,11 +197,13 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
           x: [direction * (isSpotlight ? 48 : 32), 0],
           scaleX: [isSpotlight ? 0.96 : 0.98, 1],
           rotate: isSpotlight ? [direction * 0.65, 0] : 0,
+          duration: 600,
           ease: 'out(4)',
           autoplay: onScroll(scrollSettings),
         }),
         animate(curtain, {
           scaleX: [1, 0],
+          duration: 350,
           ease: 'inOut(3)',
           autoplay: onScroll(scrollSettings),
         }),
@@ -214,6 +214,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
           animate(copy, {
             x: useLateralMotion ? [direction * -34, 0] : 0,
             y: [18, 0],
+            duration: 600,
             ease: 'out(4)',
             autoplay: onScroll(scrollSettings),
           }),

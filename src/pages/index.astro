@@ -23,7 +23,7 @@ const projects = (await getCollection('projects')).sort(
 >
   <Header />
   <main id="contenido">
-    <Hero />
+    <Hero projects={projects} />
     <ProjectSection projects={projects} />
     <Services />
     <Process />
