@@ -86,7 +86,7 @@ function ProjectCard({ project, index, prominence }: ProjectCardProps) {
               aria-label={`Abrir ${project.name} en una pestaña nueva`}
               title="Abrir proyecto"
             >
-              ↗
+              ↗&#xFE0E;
             </a>
           </div>
         )}
@@ -103,7 +103,7 @@ function ProjectCard({ project, index, prominence }: ProjectCardProps) {
               aria-label={`Abrir ${project.name} en una pestaña nueva`}
               title="Abrir proyecto"
             >
-              ↗
+              ↗&#xFE0E;
             </a>
           )}
         </div>
@@ -321,7 +321,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
               href="#contacto"
               className="bg-signal text-surface hover:bg-signal-dark justify-self-start rounded-[var(--radius-ui)] px-6 py-3.5 font-bold transition-colors active:translate-y-px lg:justify-self-end"
             >
-              Sí, hablemos <span aria-hidden="true">↗</span>
+              Sí, hablemos <span aria-hidden="true">↗&#xFE0E;</span>
             </a>
           </div>
         </div>

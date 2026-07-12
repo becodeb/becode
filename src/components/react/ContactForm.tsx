@@ -118,7 +118,7 @@ export default function ContactForm() {
         type="submit"
         className="bg-signal text-surface hover:bg-signal-dark mt-2 w-full rounded-[var(--radius-ui)] px-6 py-4 font-bold transition-colors active:translate-y-px sm:w-fit"
       >
-        Enviar consulta <span aria-hidden="true">↗</span>
+        Enviar consulta <span aria-hidden="true">↗&#xFE0E;</span>
       </button>
       <p
         className="min-h-6 text-sm font-semibold"
