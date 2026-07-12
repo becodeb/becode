@@ -23,7 +23,9 @@ import logoBe from '@/assets/logo-be.png';
           class="brand-symbol-image"
         />
       </span>
-      <span class="header-brand-text">be<span class="text-signal">/</span>code</span>
+      <span class="header-brand-text" aria-hidden="true"
+        >be<span class="text-signal">/</span>code</span
+      >
     </a>
     <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
       <a class="hover:text-signal transition-colors" href="#proyectos"
@@ -35,7 +37,7 @@ import logoBe from '@/assets/logo-be.png';
       <a class="hover:text-signal transition-colors" href="#proceso">Proceso</a>
       <a class="hover:text-signal transition-colors" href="#equipo">Equipo</a>
       <a
-        class="bg-ink text-surface hover:bg-signal rounded-[var(--radius-ui)] px-4 py-2.5 transition-colors active:translate-y-px"
+        class="bg-signal text-surface hover:bg-signal-dark rounded-[var(--radius-ui)] px-4 py-2.5 transition-colors active:translate-y-px"
         href="#contacto">Hablemos</a
       >
     </div>
@@ -192,22 +194,137 @@ import logoBe from '@/assets/logo-be.png';
     opacity: 0;
   }
 
-  @supports (animation-timeline: scroll()) {
-    .header-brand-text {
-      animation: brand-fade-in linear both;
-      animation-timeline: scroll(root);
-      animation-range: entry 0% entry 5%;
-    }
+  .header-brand-text :global(.brand-caret) {
+    display: inline-block;
+    width: 2px;
+    height: 0.95em;
+    margin-left: 2px;
+    background: var(--color-ink);
+    vertical-align: -0.1em;
+    animation: caret-blink 850ms steps(2, start) infinite;
   }
 
-  @keyframes brand-fade-in {
-    to {
-      opacity: 1;
+  @keyframes caret-blink {
+    50% {
+      opacity: 0;
     }
   }
 </style>
 
 <script>
+  const brandText = document.querySelector<HTMLElement>('.header-brand-text');
+
+  // Human-ish typing: uneven delays per letter, a beat after "be", then "code".
+  const typingSequence: Array<{ char: string; delay: number; accent?: boolean }> =
+    [
+      { char: 'b', delay: 60 },
+      { char: 'e', delay: 45 },
+      { char: '/', delay: 300, accent: true },
+      { char: 'c', delay: 340 },
+      { char: 'o', delay: 40 },
+      { char: 'd', delay: 70 },
+      { char: 'e', delay: 38 },
+    ];
+
+  // Backspacing is mechanical: constant interval, unlike the human typing.
+  const ERASE_INTERVAL = 70;
+
+  const reducedMotionQuery = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  );
+
+  type BrandState = 'hidden' | 'typing' | 'shown' | 'erasing';
+  let brandState: BrandState = 'hidden';
+  let brandTimers: number[] = [];
+  const typedLetters: HTMLElement[] = [];
+
+  const caret = document.createElement('i');
+  caret.className = 'brand-caret';
+
+  const clearBrandTimers = () => {
+    brandTimers.forEach((timer) => window.clearTimeout(timer));
+    brandTimers = [];
+  };
+
+  const schedule = (callback: () => void, ms: number) => {
+    brandTimers.push(window.setTimeout(callback, ms));
+  };
+
+  const typeBrand = () => {
+    if (!brandText || brandState === 'typing' || brandState === 'shown') {
+      return;
+    }
+    clearBrandTimers();
+    brandState = 'typing';
+
+    if (typedLetters.length === 0) brandText.textContent = '';
+    brandText.append(caret);
+    brandText.style.opacity = '1';
+
+    // From scratch the caret blinks alone first; resuming mid-erase is quicker.
+    let elapsed = typedLetters.length === 0 ? 450 : 120;
+    for (let i = typedLetters.length; i < typingSequence.length; i++) {
+      const step = typingSequence[i];
+      if (!step) continue;
+      elapsed += step.delay;
+      schedule(() => {
+        const letter = document.createElement('span');
+        if (step.accent) letter.className = 'text-signal';
+        letter.textContent = step.char;
+        caret.before(letter);
+        typedLetters.push(letter);
+        if (typedLetters.length === typingSequence.length) {
+          brandState = 'shown';
+          schedule(() => caret.remove(), 1500);
+        }
+      }, elapsed);
+    }
+  };
+
+  const eraseBrand = () => {
+    if (!brandText || brandState === 'erasing' || brandState === 'hidden') {
+      return;
+    }
+    clearBrandTimers();
+    brandState = 'erasing';
+    brandText.append(caret);
+
+    let elapsed = 150;
+    const count = typedLetters.length;
+    for (let i = 0; i < count; i++) {
+      elapsed += ERASE_INTERVAL;
+      schedule(() => {
+        typedLetters.pop()?.remove();
+        if (typedLetters.length === 0) {
+          schedule(() => {
+            caret.remove();
+            brandText.style.opacity = '0';
+            brandState = 'hidden';
+          }, 450);
+        }
+      }, elapsed);
+    }
+  };
+
+  const onBrandScroll = () => {
+    if (!brandText) return;
+    const pastThreshold = window.scrollY > 40;
+
+    if (reducedMotionQuery.matches) {
+      brandText.style.opacity = pastThreshold ? '1' : '0';
+      brandState = pastThreshold ? 'shown' : 'hidden';
+      return;
+    }
+
+    if (pastThreshold) {
+      typeBrand();
+    } else {
+      eraseBrand();
+    }
+  };
+  window.addEventListener('scroll', onBrandScroll, { passive: true });
+  onBrandScroll();
+
   const mobileNavigation =
     document.querySelector<HTMLDetailsElement>('header details');
 

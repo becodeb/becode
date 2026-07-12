@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   motion,
+  useAnimationControls,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -24,7 +25,7 @@ export interface HeroShowcaseProps {
 const ROTATION_MS = 4500;
 // Every card moves for the same duration on each shuffle so the whole deck
 // reads as one gesture.
-const FLIGHT_DURATION_S = 1.4;
+const FLIGHT_DURATION_S = .55;
 const SWAP_DURATION_S = FLIGHT_DURATION_S;
 const RISE_DURATION_S = FLIGHT_DURATION_S;
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -38,49 +39,145 @@ const TUCK_Z = 2;
 const TUCK_MS = 0.48 * FLIGHT_DURATION_S * 1000;
 const SETTLE_MS = FLIGHT_DURATION_S * 1000;
 
-type StackPosition = 'front' | 'middle' | 'back';
+// Brand accents flashed during the shuffle (theme --color-signal / --color-line).
+const SIGNAL = '#d3311d';
+const LINE = '#e1ddd4';
 
-const POSITION_ORDER: StackPosition[] = ['front', 'middle', 'back'];
+type StackPosition = 'front' | 'middle' | 'back' | 'hidden';
+
+// Cards beyond the three visible ones wait out of sight behind the deck.
+const positionFor = (offset: number): StackPosition =>
+  offset === 0
+    ? 'front'
+    : offset === 1
+      ? 'middle'
+      : offset === 2
+        ? 'back'
+        : 'hidden';
 
 const SLOT_Z: Record<StackPosition, number> = {
   front: 30,
   middle: 20,
   back: 10,
+  hidden: 4,
 };
 
 interface StackSlot {
+  x: number;
   y: number;
   scale: number;
   opacity: number;
+  rotateZ: number;
   boxShadow: string;
 }
 
-const SLOTS: Record<StackPosition, StackSlot> = {
+// Stepped deck: each card sits a bit lower than the one in front, all
+// fanned to the same side, the front one slightly tilted too.
+const SLOTS: Record<Exclude<StackPosition, 'hidden'>, StackSlot> = {
   front: {
+    x: 0,
     y: 0,
     scale: 1,
     opacity: 1,
+    rotateZ: 1.5,
     boxShadow: '0 2rem 5rem rgb(67 48 28 / 0.2)',
   },
   middle: {
-    y: 20,
+    x: 0,
+    y: 32,
     scale: 0.94,
     opacity: 0.88,
+    rotateZ: 2.8,
     boxShadow: '0 1.1rem 2.6rem rgb(67 48 28 / 0.12)',
   },
   back: {
-    y: 40,
+    x: 0,
+    y: 60,
     scale: 0.885,
     opacity: 0.75,
+    rotateZ: 5,
     boxShadow: '0 0.5rem 1.4rem rgb(67 48 28 / 0.07)',
   },
+};
+
+// The all-red card slotted between middle and back, fanned the same way.
+const RED_SLOT = { x: 0, y: 47, scale: 0.912, rotate: 4, z: 15 };
+
+// Waiting cards sit fully behind the deck, invisible until their turn.
+const HIDDEN_SLOT: StackSlot = {
+  x: 0,
+  y: 66,
+  scale: 0.87,
+  opacity: 0,
+  rotateZ: 5,
+  boxShadow: '0 0.5rem 1.4rem rgb(67 48 28 / 0.07)',
 };
 
 const PARALLAX_STRENGTH: Record<StackPosition, number> = {
   front: 16,
   middle: 10,
   back: 5,
+  hidden: 5,
 };
+
+interface RedCardProps {
+  front: number;
+  parallaxX: MotionValue<number>;
+  parallaxY: MotionValue<number>;
+  reducedMotion: boolean;
+}
+
+// A plain red card living inside the deck: same size and radius as the
+// others, its own tilt and parallax layer, and a sympathetic dip on every
+// shuffle so it moves with the rest of the stack.
+function RedCard({ front, parallaxX, parallaxY, reducedMotion }: RedCardProps) {
+  const controls = useAnimationControls();
+  const mounted = useRef(false);
+  const x = useTransform(parallaxX, (value) => value * 7);
+  const y = useTransform(parallaxY, (value) => value * 7 * 0.6);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    if (reducedMotion) return;
+    controls.start({
+      y: [RED_SLOT.y, RED_SLOT.y + 36, RED_SLOT.y],
+      rotate: [RED_SLOT.rotate, RED_SLOT.rotate - 2.5, RED_SLOT.rotate],
+      transition: {
+        duration: RISE_DURATION_S,
+        ease: 'easeInOut',
+        times: [0, 0.45, 1],
+      },
+    });
+  }, [front, reducedMotion, controls]);
+
+  return (
+    <div
+      className="absolute inset-0"
+      style={{ zIndex: RED_SLOT.z }}
+      aria-hidden="true"
+    >
+      <motion.div className="h-full w-full" style={{ x, y }}>
+        <motion.div
+          className="bg-signal h-full w-full rounded-[var(--radius-ui)]"
+          style={{
+            transformOrigin: '50% 50%',
+            boxShadow: '0 0.9rem 2.2rem rgb(211 49 29 / 0.16)',
+          }}
+          initial={{
+            x: RED_SLOT.x,
+            y: RED_SLOT.y,
+            rotate: RED_SLOT.rotate,
+            scale: RED_SLOT.scale,
+          }}
+          animate={controls}
+        />
+      </motion.div>
+    </div>
+  );
+}
 
 interface ShowcaseCardProps {
   project: ShowcaseProject;
@@ -101,14 +198,20 @@ function ShowcaseCard({
   // True for the whole flight: the ref is only advanced once the card has
   // settled, so re-renders mid-flight keep the same keyframe target.
   const inFlight =
-    previousPosition.current === 'front' && position === 'back';
+    previousPosition.current === 'front' &&
+    (position === 'back' || position === 'hidden');
   const promoted =
     previousPosition.current === 'middle' && position === 'front';
   const stepped =
     previousPosition.current === 'back' && position === 'middle';
 
   useEffect(() => {
-    if (!(previousPosition.current === 'front' && position === 'back')) {
+    if (
+      !(
+        previousPosition.current === 'front' &&
+        (position === 'back' || position === 'hidden')
+      )
+    ) {
       previousPosition.current = position;
       return;
     }
@@ -124,7 +227,7 @@ function ShowcaseCard({
     };
   }, [position]);
 
-  const slot = SLOTS[position];
+  const slot = position === 'hidden' ? HIDDEN_SLOT : SLOTS[position];
   const strength = PARALLAX_STRENGTH[position];
   const x = useTransform(parallaxX, (value) => value * strength);
   const y = useTransform(parallaxY, (value) => value * strength * 0.6);
@@ -137,25 +240,36 @@ function ShowcaseCard({
   const target: TargetAndTransition = inFlight
     ? {
         ...slot,
-        x: [null, 150, 70, 0],
-        y: [null, -300, -130, slot.y],
-        rotateZ: [null, 13, 5, 0],
-        scale: [null, 0.97, 0.92, slot.scale],
+        x: [null, 110, 50, slot.x],
+        y: [null, -220, -95, slot.y],
+        rotateZ: [null, 9, 3.5, slot.rotateZ],
+        scale: [null, 0.88, 0.85, slot.scale],
+        // Fully visible for the whole arc; if it lands on the hidden slot it
+        // only fades once it is already tucked behind the deck.
+        opacity: [null, 1, 1, slot.opacity],
+        borderColor: [null, SIGNAL, SIGNAL, LINE],
+        boxShadow: [
+          null,
+          '0 1.8rem 4.2rem rgb(211 49 29 / 0.3)',
+          '0 1rem 2.6rem rgb(211 49 29 / 0.18)',
+          slot.boxShadow,
+        ],
       }
     : promoted
       ? {
           ...slot,
-          x: [null, -52, -20, 0],
+          x: [null, -52, -20, slot.x],
           y: [null, 62, 24, slot.y],
-          rotateZ: [null, -6, -2.5, 0],
+          rotateZ: [null, -6, -2.5, slot.rotateZ],
           scale: [null, 0.95, 0.985, slot.scale],
+          borderColor: [null, SIGNAL, LINE],
         }
       : stepped
         ? {
             ...slot,
-            x: [null, -34, -14, 0],
+            x: [null, -34, -14, slot.x],
             y: [null, 82, 44, slot.y],
-            rotateZ: [null, -6, -2.5, 0],
+            rotateZ: [null, -6, -2.5, slot.rotateZ],
             scale: [null, 0.915, 0.93, slot.scale],
           }
         : { ...slot };
@@ -171,7 +285,7 @@ function ShowcaseCard({
       className="border-line bg-surface absolute inset-0 overflow-hidden rounded-[var(--radius-ui)] border"
       style={{
         zIndex: flightZ ?? (inFlight ? LIFT_Z : SLOT_Z[position]),
-        transformOrigin: '50% 100%',
+        transformOrigin: '50% 50%',
       }}
       initial={false}
       animate={target}
@@ -221,7 +335,7 @@ function ShowcaseCard({
 
 export default function HeroShowcase({ projects }: HeroShowcaseProps) {
   const reducedMotion = useReducedMotion();
-  const deck = useMemo(() => projects.slice(0, 3), [projects]);
+  const deck = projects;
   const [front, setFront] = useState(0);
 
   const pointerX = useMotionValue(0);
@@ -266,14 +380,17 @@ export default function HeroShowcase({ projects }: HeroShowcaseProps) {
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
     >
+      <RedCard
+        front={front}
+        parallaxX={parallaxX}
+        parallaxY={parallaxY}
+        reducedMotion={reducedMotion ?? false}
+      />
       {deck.map((project, index) => (
         <ShowcaseCard
           key={project.id}
           project={project}
-          position={
-            POSITION_ORDER[(index - front + deck.length) % deck.length] ??
-            'back'
-          }
+          position={positionFor((index - front + deck.length) % deck.length)}
           parallaxX={parallaxX}
           parallaxY={parallaxY}
         />
