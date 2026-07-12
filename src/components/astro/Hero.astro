@@ -85,16 +85,6 @@ const showcaseProjects = projects.flatMap(({ id, data }) =>
     animation: product-in 600ms 520ms forwards cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .showcase-slot::before {
-    position: absolute;
-    z-index: 5;
-    inset: -5.5% -3% 16% 9%;
-    border-radius: var(--radius-ui);
-    background: var(--color-signal);
-    content: '';
-    transform: rotate(2deg);
-  }
-
   @keyframes hero-in {
     from {
       opacity: 0;

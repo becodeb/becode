@@ -5,6 +5,7 @@ import {
   useReducedMotion,
   useSpring,
   useTransform,
+  type Easing,
   type MotionValue,
   type TargetAndTransition,
 } from 'framer-motion';
@@ -21,17 +22,20 @@ export interface HeroShowcaseProps {
 }
 
 const ROTATION_MS = 4500;
-const SWAP_DURATION_S = 0.8;
-const FLIGHT_DURATION_S = 1.15;
-const FLIGHT_TIMES = [0, 0.42, 0.7, 1];
+// Every card moves for the same duration on each shuffle so the whole deck
+// reads as one gesture.
+const FLIGHT_DURATION_S = 1.4;
+const SWAP_DURATION_S = FLIGHT_DURATION_S;
+const RISE_DURATION_S = FLIGHT_DURATION_S;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // z choreography for the card leaving the front: it lifts above everything,
-// crosses behind the red accent block (z 5 in Hero.astro), then settles at
-// the back of the stack. The layer switches are snaps, never tweens.
+// and switches behind the deck near the top of its arc — where it barely
+// overlaps the other cards — so it reads as passing behind, not through.
+// The layer switches are snaps, never tweens.
 const LIFT_Z = 40;
 const TUCK_Z = 2;
-const TUCK_MS = FLIGHT_TIMES[1]! * FLIGHT_DURATION_S * 1000;
+const TUCK_MS = 0.48 * FLIGHT_DURATION_S * 1000;
 const SETTLE_MS = FLIGHT_DURATION_S * 1000;
 
 type StackPosition = 'front' | 'middle' | 'back';
@@ -98,6 +102,10 @@ function ShowcaseCard({
   // settled, so re-renders mid-flight keep the same keyframe target.
   const inFlight =
     previousPosition.current === 'front' && position === 'back';
+  const promoted =
+    previousPosition.current === 'middle' && position === 'front';
+  const stepped =
+    previousPosition.current === 'back' && position === 'middle';
 
   useEffect(() => {
     if (!(previousPosition.current === 'front' && position === 'back')) {
@@ -121,23 +129,42 @@ function ShowcaseCard({
   const x = useTransform(parallaxX, (value) => value * strength);
   const y = useTransform(parallaxY, (value) => value * strength * 0.6);
 
-  // Deal-a-card path: lift and tilt up-to-the-right, slide behind the red
-  // block, then descend into the back slot. The card never fades out.
+  // Deal-a-card path: lift and tilt up-to-the-right in a wide continuous
+  // arc, slide behind the red block while descending, then land in the back
+  // slot. x and y peak at different moments so the card never sits still.
+  // The card promoted to the front mirrors it: it slips out below-left and
+  // rises into place while the leaving card is still mid-air.
   const target: TargetAndTransition = inFlight
     ? {
         ...slot,
-        x: [null, 56, 30, 0],
-        y: [null, -110, -38, slot.y],
-        rotateZ: [null, 7, 3.5, 0],
-        scale: [null, 0.96, 0.92, slot.scale],
+        x: [null, 150, 70, 0],
+        y: [null, -300, -130, slot.y],
+        rotateZ: [null, 13, 5, 0],
+        scale: [null, 0.97, 0.92, slot.scale],
       }
-    : { ...slot };
+    : promoted
+      ? {
+          ...slot,
+          x: [null, -52, -20, 0],
+          y: [null, 62, 24, slot.y],
+          rotateZ: [null, -6, -2.5, 0],
+          scale: [null, 0.95, 0.985, slot.scale],
+        }
+      : stepped
+        ? {
+            ...slot,
+            x: [null, -34, -14, 0],
+            y: [null, 82, 44, slot.y],
+            rotateZ: [null, -6, -2.5, 0],
+            scale: [null, 0.915, 0.93, slot.scale],
+          }
+        : { ...slot };
 
-  const flightTransition = {
-    duration: FLIGHT_DURATION_S,
-    ease: EASE,
-    times: FLIGHT_TIMES,
-  };
+  const seg = (duration: number, times: number[], ease: Easing[]) => ({
+    duration,
+    times,
+    ease,
+  });
 
   return (
     <motion.article
@@ -152,12 +179,20 @@ function ShowcaseCard({
         inFlight
           ? {
               default: { duration: FLIGHT_DURATION_S, ease: EASE },
-              x: flightTransition,
-              y: flightTransition,
-              rotateZ: flightTransition,
-              scale: flightTransition,
+              x: seg(FLIGHT_DURATION_S, [0, 0.52, 0.78, 1], ['easeOut', 'easeInOut', 'easeOut']),
+              y: seg(FLIGHT_DURATION_S, [0, 0.42, 0.72, 1], ['easeOut', 'easeIn', 'easeOut']),
+              rotateZ: seg(FLIGHT_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
+              scale: seg(FLIGHT_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
             }
-          : { default: { duration: SWAP_DURATION_S, ease: EASE } }
+          : promoted || stepped
+            ? {
+                default: { duration: RISE_DURATION_S, ease: EASE },
+                x: seg(RISE_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
+                y: seg(RISE_DURATION_S, [0, 0.4, 0.72, 1], ['easeOut', 'easeInOut', 'easeOut']),
+                rotateZ: seg(RISE_DURATION_S, [0, 0.44, 0.74, 1], ['easeOut', 'easeInOut', 'easeOut']),
+                scale: seg(RISE_DURATION_S, [0, 0.44, 0.74, 1], ['easeOut', 'easeInOut', 'easeOut']),
+              }
+            : { default: { duration: SWAP_DURATION_S, ease: EASE } }
       }
     >
       <motion.div className="flex h-full w-full flex-col" style={{ x, y }}>
