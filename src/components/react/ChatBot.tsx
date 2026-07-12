@@ -44,8 +44,47 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [active, setActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+
+  // The launcher rests small and faded, and expands to full presence when the
+  // pointer comes near it or when the visitor reaches the bottom of the page.
+  useEffect(() => {
+    const ACTIVATION_RADIUS = 190;
+    let nearBottom = false;
+    let nearPointer = false;
+
+    const sync = () => setActive(nearBottom || nearPointer);
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const launcher = launcherRef.current;
+      if (!launcher) return;
+      const rect = launcher.getBoundingClientRect();
+      const dx = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right);
+      const dy = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom);
+      nearPointer = Math.hypot(dx, dy) < ACTIVATION_RADIUS;
+      sync();
+    };
+
+    const handleScroll = () => {
+      const remaining =
+        document.documentElement.scrollHeight -
+        window.scrollY -
+        window.innerHeight;
+      nearBottom = remaining < 240;
+      sync();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -245,16 +284,18 @@ export default function ChatBot() {
       )}
 
       <button
+        ref={launcherRef}
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-label={
           open ? 'Cerrar el asistente' : 'Abrir el asistente de IA de becode'
         }
-        className="border-ink bg-surface text-ink shadow-window hover:border-signal flex min-h-14 items-center gap-2.5 rounded-[var(--radius-ui)] border p-2 pr-3 text-left transition-colors"
+        data-active={active || open}
+        className="assistant-launcher border-ink bg-surface text-ink shadow-window hover:border-signal flex min-h-14 items-center gap-2.5 rounded-[var(--radius-ui)] border p-2 pr-3 text-left"
       >
-        <AssistantLogo className="h-11 w-11" />
-        <span className="min-w-0">
+        <AssistantLogo className="assistant-launcher-logo h-11 w-11" />
+        <span className="assistant-launcher-copy min-w-0">
           <strong className="font-display block text-sm font-semibold whitespace-nowrap">
             Asistente de IA
           </strong>

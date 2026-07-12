@@ -270,7 +270,13 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
 
       {compactProjects.length > 0 && (
         <div className="project-outro border-line mt-20 border-t pt-12 sm:mt-24 sm:pt-14">
-          <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-8">
+          <div
+            className={`grid items-center gap-x-12 gap-y-8 ${
+              showAllProjects
+                ? 'lg:grid-cols-[1.3fr_auto]'
+                : 'lg:grid-cols-[1.3fr_1fr_auto]'
+            }`}
+          >
             <div>
               <p className="eyebrow text-signal mb-4">Siguiente paso</p>
               <h3 className="font-display text-3xl font-semibold sm:text-4xl">
@@ -281,23 +287,42 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
                 vamos directo a hablar del tuyo.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {!showAllProjects && (
-                <button
-                  type="button"
-                  onClick={() => setShowAllProjects(true)}
-                  className="border-ink hover:bg-ink hover:text-surface rounded-[var(--radius-ui)] border px-6 py-3.5 font-bold transition-colors active:translate-y-px"
-                >
-                  Ver otros proyectos
-                </button>
-              )}
-              <a
-                href="#contacto"
-                className="bg-signal text-surface hover:bg-signal-dark rounded-[var(--radius-ui)] px-6 py-3.5 font-bold transition-colors active:translate-y-px"
+            {!showAllProjects && (
+              <button
+                type="button"
+                onClick={() => setShowAllProjects(true)}
+                className="deck-toggle border-line bg-surface hover:border-ink flex items-center gap-6 rounded-[var(--radius-ui)] border p-6 text-left transition-colors active:translate-y-px sm:p-7"
               >
-                Sí, hablemos <span aria-hidden="true">↗</span>
-              </a>
-            </div>
+                <span className="deck-fan" aria-hidden="true">
+                  <span className="deck-thumb deck-thumb--red" />
+                  {compactProjects
+                    .filter((project) => project.screenshot)
+                    .slice(0, 3)
+                    .map((project, index) => (
+                      <span
+                        key={project.id}
+                        className={`deck-thumb deck-thumb--${index}`}
+                      >
+                        <img src={project.screenshot} alt="" />
+                      </span>
+                    ))}
+                </span>
+                <span>
+                  <span className="font-display block text-lg font-semibold">
+                    Ver otros proyectos
+                  </span>
+                  <span className="text-signal mt-1 block font-mono text-xs font-semibold">
+                    +{compactProjects.length} en el mazo
+                  </span>
+                </span>
+              </button>
+            )}
+            <a
+              href="#contacto"
+              className="bg-signal text-surface hover:bg-signal-dark justify-self-start rounded-[var(--radius-ui)] px-6 py-3.5 font-bold transition-colors active:translate-y-px lg:justify-self-end"
+            >
+              Sí, hablemos <span aria-hidden="true">↗</span>
+            </a>
           </div>
         </div>
       )}

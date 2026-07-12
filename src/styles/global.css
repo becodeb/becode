@@ -267,3 +267,44 @@ textarea {
     transform: scale(1);
   }
 }
+
+/* Launcher rests compact and faded; expands to full presence when the pointer
+   is near or the visitor reaches the bottom of the page (data-active). */
+.assistant-launcher {
+  transform-origin: bottom right;
+  opacity: 0.55;
+  transform: scale(0.72);
+  transition:
+    opacity 320ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    transform 320ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    border-color 200ms ease;
+}
+
+.assistant-launcher[data-active='true'] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.assistant-launcher-copy {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 340ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    opacity 260ms ease,
+    margin-left 340ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  margin-left: -0.625rem;
+}
+
+.assistant-launcher[data-active='true'] .assistant-launcher-copy {
+  max-width: 12rem;
+  opacity: 1;
+  margin-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-launcher,
+  .assistant-launcher-copy {
+    transition: none;
+  }
+}
