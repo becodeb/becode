@@ -11,6 +11,12 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      # Must match EXPOSE 4321 in the Dockerfile.
+      # Coolify may inject PORT=8080 via .env — this overrides it.
+      PORT: "4321"
+      HOST: "0.0.0.0"
+      NODE_ENV: "production"
     volumes:
       - uploads:/app/uploads
     depends_on:
