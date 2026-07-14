@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+.git/
+.gitignore
+.env
+.env.*
+*.log
+.DS_Store
+uploads/
+README.md
+openspec/
+.atl/
+.agents/
+.claude/
+skills-lock.json
