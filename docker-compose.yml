@@ -17,6 +17,8 @@ services:
       PORT: "4321"
       HOST: "0.0.0.0"
       NODE_ENV: "production"
+      # Uses Coolify's value if set, otherwise defaults to the db service.
+      DATABASE_URL: "${DATABASE_URL:-postgresql://becode:becode@db:5432/becode}"
     volumes:
       - uploads:/app/uploads
     depends_on:
