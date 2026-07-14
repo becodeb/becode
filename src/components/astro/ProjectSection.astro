@@ -10,10 +10,7 @@ const { projects } = Astro.props;
 const serializedProjects = projects.map(({ id, data }) => ({ id, ...data }));
 ---
 
-<section
-  id="proyectos"
-  class="section-space border-line bg-surface border-t"
->
+<section id="proyectos" class="section-space border-line bg-surface border-t">
   <div class="shell">
     <div class="reveal mb-14 max-w-4xl">
       <p class="eyebrow text-signal mb-5">Trabajo real, en uso</p>

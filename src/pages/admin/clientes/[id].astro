@@ -1,0 +1,305 @@
+---
+import Checklist from '@/components/astro/portal/Checklist.astro';
+import StatusBadge from '@/components/astro/portal/StatusBadge.astro';
+import Timeline from '@/components/astro/portal/Timeline.astro';
+import AdminActions from '@/components/react/admin/AdminActions';
+import NoteComposer from '@/components/react/admin/NoteComposer';
+import PromptsViewer from '@/components/react/admin/PromptsViewer';
+import TagPicker from '@/components/react/admin/TagPicker';
+import FileUploader from '@/components/react/portal/FileUploader';
+import MessagesThread from '@/components/react/portal/MessagesThread';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import { urgencyLabel } from '@/lib/brief-options';
+import { formatDate, formatDateTime } from '@/lib/project-status';
+import { prisma } from '@/lib/server/db';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+const project = await prisma.project.findUnique({
+  where: { id: Astro.params.id ?? '' },
+  include: {
+    brief: true,
+    company: true,
+    client: true,
+    tags: true,
+    files: { orderBy: { createdAt: 'desc' } },
+    timelineEvents: { orderBy: { createdAt: 'desc' } },
+    checklistItems: { orderBy: { order: 'asc' } },
+    prompts: { orderBy: { createdAt: 'desc' } },
+    internalNotes: {
+      orderBy: { createdAt: 'desc' },
+      include: { author: { select: { firstName: true } } },
+    },
+    messages: {
+      orderBy: { createdAt: 'asc' },
+      include: { sender: { select: { firstName: true, role: true } } },
+    },
+  },
+});
+
+if (!project) return Astro.redirect('/admin/clientes');
+
+const allTags = await prisma.tag.findMany({ orderBy: { name: 'asc' } });
+const brief = project.brief;
+
+const briefRows = brief
+  ? [
+      ['Tipo de sitio', brief.siteType],
+      ['Rubro', brief.industry],
+      ['Estética', (brief.aesthetics as string[]).join(', ') || '—'],
+      ['Colores', (brief.colors as string[]).join(', ') || '—'],
+      ['Sensaciones', (brief.feelings as string[]).join(', ') || '—'],
+      ['Secciones', (brief.sections as string[]).join(', ') || '—'],
+      ['Funcionalidades', (brief.features as string[]).join(', ') || '—'],
+      ['Logo', brief.hasLogo ? 'Tiene' : 'No tiene'],
+      ['Identidad visual', brief.hasBrand ? 'Tiene' : 'No tiene'],
+      ['Dominio', brief.hasDomain ? 'Tiene' : 'No tiene'],
+      ['Presupuesto', `${brief.budgetRange} USD`],
+      ['Urgencia', urgencyLabel(brief.urgency)],
+    ]
+  : [];
+
+const referenceUrls = (brief?.referenceUrls as string[] | undefined) ?? [];
+
+const threadMessages = project.messages.map((message) => ({
+  id: message.id,
+  content: message.content,
+  mine: message.senderId === user.id,
+  senderName:
+    message.sender.role === 'OWNER'
+      ? `${message.sender.firstName} · becode`
+      : 'Cliente',
+  createdAt: formatDateTime(message.createdAt),
+}));
+
+const fileItems = project.files.map((file) => ({
+  id: file.id,
+  filename: file.filename,
+  size: file.size,
+  canDelete: true,
+}));
+
+const promptItems = project.prompts.map((prompt) => ({
+  id: prompt.id,
+  kind: prompt.kind,
+  content: prompt.content,
+  model: prompt.model,
+  createdAt: formatDateTime(prompt.createdAt),
+}));
+---
+
+<PortalLayout title={project.company.name} variant="admin">
+  <div class="portal-enter space-y-6">
+    <header class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a
+          href="/admin/clientes"
+          class="border-line hover:border-ink grid h-9 w-9 place-items-center rounded-[var(--radius-ui)] border transition-colors"
+          aria-label="Volver a clientes"
+        >
+          ←
+        </a>
+        <div>
+          <h1 class="font-display text-2xl font-bold tracking-tight">
+            {project.company.name}
+          </h1>
+          <p class="text-muted text-sm">{project.title}</p>
+        </div>
+      </div>
+      <StatusBadge status={project.status} />
+    </header>
+
+    <div class="grid gap-6 xl:grid-cols-4">
+      {/* Columna izquierda: información general */}
+      <div class="space-y-6 xl:col-span-1">
+        <section class="portal-card p-5" aria-label="Información general">
+          <h2 class="font-display mb-4 text-base font-bold">Información</h2>
+          <dl class="space-y-3 text-sm">
+            <div>
+              <dt class="text-muted text-xs font-semibold uppercase">
+                Contacto
+              </dt>
+              <dd class="mt-0.5 font-medium">
+                {project.client.firstName}
+                {project.client.lastName}
+              </dd>
+              <dd class="text-muted break-all">{project.client.email}</dd>
+            </div>
+            <div>
+              <dt class="text-muted text-xs font-semibold uppercase">
+                Registro
+              </dt>
+              <dd class="mt-0.5">{formatDate(project.client.createdAt)}</dd>
+            </div>
+            {
+              project.approvedAt && (
+                <div>
+                  <dt class="text-muted text-xs font-semibold uppercase">
+                    Aprobado
+                  </dt>
+                  <dd class="mt-0.5">{formatDate(project.approvedAt)}</dd>
+                </div>
+              )
+            }
+          </dl>
+          <div class="border-line mt-4 border-t pt-4">
+            <h3 class="text-muted mb-2 text-xs font-semibold uppercase">
+              Etiquetas
+            </h3>
+            <TagPicker
+              client:visible
+              projectId={project.id}
+              tags={allTags}
+              assignedIds={project.tags.map((tag) => tag.id)}
+            />
+          </div>
+        </section>
+
+        <section class="portal-card p-5" aria-label="Acciones">
+          <h2 class="font-display mb-4 text-base font-bold">Acciones</h2>
+          <AdminActions
+            client:load
+            projectId={project.id}
+            clientId={project.clientId}
+            status={project.status}
+            priority={project.priority}
+            quote={project.quote === null ? null : Number(project.quote)}
+            hasPrompts={project.prompts.length > 0}
+          />
+        </section>
+      </div>
+
+      {/* Columna central: brief, IA, timeline, mensajes */}
+      <div class="space-y-6 xl:col-span-2">
+        <section class="portal-card p-6" aria-label="Brief">
+          <h2 class="font-display mb-4 text-base font-bold">
+            Brief del cliente
+          </h2>
+          {
+            !brief ? (
+              <p class="text-muted text-sm">
+                El cliente todavía no completó el formulario.
+              </p>
+            ) : (
+              <>
+                <dl class="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+                  {briefRows.map(([label, value]) => (
+                    <div>
+                      <dt class="text-muted text-xs font-semibold uppercase">
+                        {label}
+                      </dt>
+                      <dd class="mt-0.5">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {referenceUrls.length > 0 && (
+                  <div class="mt-4">
+                    <h3 class="text-muted text-xs font-semibold uppercase">
+                      Referencias
+                    </h3>
+                    <ul class="mt-1 space-y-1">
+                      {referenceUrls.map((url) => (
+                        <li>
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-signal font-mono text-xs break-all hover:underline"
+                          >
+                            {url}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {brief.comment && (
+                  <blockquote class="border-signal/40 text-muted mt-4 border-l-2 pl-3 text-sm italic">
+                    “{brief.comment}”
+                  </blockquote>
+                )}
+              </>
+            )
+          }
+        </section>
+
+        <section class="portal-card p-6" aria-label="Documentación IA">
+          <h2 class="font-display mb-4 text-base font-bold">
+            Documentación IA
+          </h2>
+          <PromptsViewer client:visible prompts={promptItems} />
+        </section>
+
+        <section class="portal-card p-6" aria-label="Checklist">
+          <h2 class="font-display mb-4 text-base font-bold">Checklist</h2>
+          <Checklist items={project.checklistItems} interactive={true} />
+        </section>
+
+        <section class="portal-card p-6" aria-label="Timeline">
+          <h2 class="font-display mb-4 text-base font-bold">Timeline</h2>
+          <Timeline events={project.timelineEvents} />
+        </section>
+
+        <section class="portal-card p-6" aria-label="Mensajes con el cliente">
+          <h2 class="font-display mb-4 text-base font-bold">Mensajes</h2>
+          <MessagesThread
+            client:visible
+            projectId={project.id}
+            messages={threadMessages}
+          />
+        </section>
+      </div>
+
+      {/* Columna derecha: archivos y notas internas */}
+      <div class="space-y-6 xl:col-span-1">
+        <section class="portal-card p-5" aria-label="Archivos">
+          <h2 class="font-display mb-4 text-base font-bold">Archivos</h2>
+          <FileUploader
+            client:visible
+            files={fileItems}
+            projectId={project.id}
+            canUpload={true}
+          />
+        </section>
+
+        <section class="portal-card p-5" aria-label="Notas internas">
+          <h2 class="font-display mb-1 text-base font-bold">Notas internas</h2>
+          <p class="text-dim mb-4 text-xs">Solo visibles para el equipo.</p>
+          <div class="mb-4">
+            <NoteComposer client:visible projectId={project.id} />
+          </div>
+          {
+            project.internalNotes.length > 0 && (
+              <ul class="space-y-3">
+                {project.internalNotes.map((note) => (
+                  <li class="border-line bg-paper rounded-[var(--radius-ui)] border px-3 py-2.5">
+                    <p class="text-sm whitespace-pre-wrap">{note.content}</p>
+                    <p class="text-dim mt-1.5 font-mono text-[0.6rem]">
+                      {note.author.firstName} · {formatDateTime(note.createdAt)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle de checklist: recarga tras confirmar el cambio en el servidor.
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-checklist-item]')
+      .forEach((button) => {
+        button.addEventListener('click', async () => {
+          button.disabled = true;
+          await fetch(`/api/admin/checklist/${button.dataset.checklistItem}`, {
+            method: 'POST',
+          });
+          window.location.reload();
+        });
+      });
+  </script>
+</PortalLayout>

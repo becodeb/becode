@@ -6,3 +6,9 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Archivos subidos por clientes
+uploads/
+
+# Cliente Prisma generado
+src/generated/

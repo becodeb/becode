@@ -1,0 +1,60 @@
+---
+import BriefWizard from '@/components/react/portal/BriefWizard';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import { prisma } from '@/lib/server/db';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+if (user.role === 'OWNER') return Astro.redirect('/admin');
+
+const project = await prisma.project.findFirst({
+  where: { clientId: user.id },
+  orderBy: { createdAt: 'desc' },
+  include: { brief: true },
+});
+
+// Con el proyecto ya aprobado, las respuestas no se editan más.
+if (project && project.status !== 'PENDIENTE') return Astro.redirect('/app');
+
+const brief = project?.brief;
+const initial = brief
+  ? {
+      siteType: brief.siteType,
+      industry: brief.industry,
+      aesthetics: brief.aesthetics as string[],
+      colors: brief.colors as string[],
+      feelings: brief.feelings as string[],
+      sections: brief.sections as string[],
+      features: brief.features as string[],
+      hasLogo: brief.hasLogo,
+      hasBrand: brief.hasBrand,
+      hasDomain: brief.hasDomain,
+      budgetRange: brief.budgetRange,
+      urgency: brief.urgency,
+      referenceUrls: brief.referenceUrls as string[],
+      comment: brief.comment ?? '',
+    }
+  : undefined;
+---
+
+<PortalLayout title={brief ? 'Editar brief' : 'Brief del proyecto'}>
+  <div class="portal-enter mx-auto max-w-3xl">
+    <header class="mb-8">
+      <p class="text-signal font-mono text-xs tracking-widest uppercase">
+        Brief inteligente
+      </p>
+      <h1 class="font-display mt-2 text-3xl font-bold tracking-tight">
+        {brief ? 'Ajustá tus respuestas' : 'Contanos tu proyecto'}
+      </h1>
+      <p class="text-muted mt-2 text-sm">
+        Son 5 pasos cortos, casi todo con un click. Al final podés subir tu logo
+        y material de referencia.
+      </p>
+    </header>
+
+    <div class="portal-card p-6 sm:p-8">
+      <BriefWizard client:load initial={initial} />
+    </div>
+  </div>
+</PortalLayout>

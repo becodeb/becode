@@ -1,0 +1,31 @@
+---
+import LoginForm from '@/components/react/auth/LoginForm';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+
+export const prerender = false;
+
+const next = Astro.url.searchParams.get('next') ?? undefined;
+---
+
+<PortalLayout title="Iniciar sesión" variant="auth">
+  <div class="portal-enter mx-auto max-w-md">
+    <div class="mb-8 text-center">
+      <h1 class="font-display text-3xl font-bold tracking-tight">
+        Hola de nuevo
+      </h1>
+      <p class="text-muted mt-2 text-sm">Ingresá para seguir tu proyecto.</p>
+    </div>
+    <div class="portal-card p-6 sm:p-8">
+      <LoginForm client:load next={next} />
+    </div>
+    <p class="text-muted mt-6 text-center text-sm">
+      ¿Todavía no tenés cuenta?
+      <a
+        href="/registro"
+        class="text-ink hover:text-signal font-semibold underline underline-offset-2"
+      >
+        Comenzá tu proyecto
+      </a>
+    </p>
+  </div>
+</PortalLayout>

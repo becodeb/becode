@@ -1,0 +1,166 @@
+---
+import ChatBot from '@/components/react/ChatBot';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  /** 'app' muestra el chat del sitio; 'admin' muestra la navegación del CRM. */
+  variant?: 'app' | 'admin' | 'auth';
+}
+
+const { title, variant = 'app' } = Astro.props;
+const user = Astro.locals.user;
+const currentPath = Astro.url.pathname;
+
+const adminNav = [
+  { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/clientes', label: 'Clientes' },
+  { href: '/admin/biblioteca', label: 'Biblioteca' },
+];
+
+const isActive = (href: string) =>
+  href === '/admin' ? currentPath === '/admin' : currentPath.startsWith(href);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <meta name="description" content="Portal de clientes de becode" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      // Aplica el tema guardado antes del primer paint para evitar flashes.
+      const theme = localStorage.getItem('becode-theme');
+      if (theme === 'dark') document.documentElement.dataset.theme = 'dark';
+    </script>
+    <title>{title} · becode</title>
+  </head>
+  <body class="min-h-screen">
+    <header
+      class="border-line bg-surface/80 sticky top-0 z-40 border-b backdrop-blur"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6"
+      >
+        <div class="flex items-center gap-6">
+          <a href="/" class="font-display text-lg font-bold tracking-tight">
+            be<span class="text-signal">code</span>
+            {
+              variant === 'admin' && (
+                <span class="text-muted font-mono text-[0.65rem] font-normal">
+                  /crm
+                </span>
+              )
+            }
+          </a>
+          {
+            variant === 'admin' && (
+              <nav
+                aria-label="Secciones del CRM"
+                class="hidden items-center gap-1 sm:flex"
+              >
+                {adminNav.map((item) => (
+                  <a
+                    href={item.href}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    class:list={[
+                      'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm transition-colors',
+                      isActive(item.href)
+                        ? 'bg-ink text-surface'
+                        : 'text-muted hover:text-ink',
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+            )
+          }
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Cambiar tema claro/oscuro"
+            class="border-line text-muted hover:text-ink grid h-9 w-9 place-items-center rounded-[var(--radius-ui)] border transition-colors"
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path
+                d="M12 3v2m0 14v2M5.2 5.2l1.4 1.4m10.8 10.8 1.4 1.4M3 12h2m14 0h2M5.2 18.8l1.4-1.4M17.4 6.6l1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"></path>
+            </svg>
+          </button>
+          {
+            user && (
+              <div class="flex items-center gap-3">
+                <span class="text-muted hidden text-sm sm:block">
+                  {user.firstName} {user.lastName}
+                </span>
+                <form method="post" action="/api/auth/logout" id="logout-form">
+                  <button
+                    type="submit"
+                    class="border-line hover:border-signal hover:text-signal rounded-[var(--radius-ui)] border px-3 py-1.5 text-sm transition-colors"
+                  >
+                    Salir
+                  </button>
+                </form>
+              </div>
+            )
+          }
+        </div>
+      </div>
+      {
+        variant === 'admin' && (
+          <nav
+            aria-label="Secciones del CRM"
+            class="border-line flex gap-1 overflow-x-auto border-t px-4 py-2 sm:hidden"
+          >
+            {adminNav.map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm whitespace-nowrap',
+                  isActive(item.href) ? 'bg-ink text-surface' : 'text-muted',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        )
+      }
+    </header>
+
+    <main
+      id="contenido"
+      class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10"
+    >
+      <slot />
+    </main>
+
+    {variant === 'app' && <ChatBot client:idle />}
+
+    <script>
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        if (next === 'dark') root.dataset.theme = 'dark';
+        else delete root.dataset.theme;
+        localStorage.setItem('becode-theme', next);
+      });
+
+      const logoutForm = document.getElementById('logout-form');
+      logoutForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+---
+import type { TimelineEvent } from '@/generated/prisma/client';
+import { formatDateTime } from '@/lib/project-status';
+
+interface Props {
+  events: TimelineEvent[];
+}
+
+const { events } = Astro.props;
+---
+
+{
+  events.length === 0 ? (
+    <p class="text-muted text-sm">Todavía no hay actividad registrada.</p>
+  ) : (
+    <ol class="space-y-0">
+      {events.map((event, index) => (
+        <li class="relative flex gap-3 pb-5 last:pb-0">
+          {index < events.length - 1 && (
+            <span
+              class="bg-line absolute top-4 left-[0.4375rem] h-full w-px"
+              aria-hidden="true"
+            />
+          )}
+          <span
+            class:list={[
+              'mt-1 h-2 w-2 shrink-0 rounded-full ring-4',
+              index === 0 ? 'bg-signal ring-signal/15' : 'bg-dim ring-line/60',
+            ]}
+            aria-hidden="true"
+          />
+          <div class="min-w-0">
+            <p class="text-sm font-semibold">{event.title}</p>
+            {event.description && (
+              <p class="text-muted mt-0.5 text-xs">{event.description}</p>
+            )}
+            <p class="text-dim mt-0.5 font-mono text-[0.65rem]">
+              {formatDateTime(event.createdAt)}
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  )
+}

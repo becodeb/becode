@@ -1,0 +1,178 @@
+---
+import Checklist from '@/components/astro/portal/Checklist.astro';
+import StatusBadge from '@/components/astro/portal/StatusBadge.astro';
+import Timeline from '@/components/astro/portal/Timeline.astro';
+import FileUploader from '@/components/react/portal/FileUploader';
+import MessagesThread from '@/components/react/portal/MessagesThread';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import {
+  PROJECT_STATUSES,
+  STATUS_META,
+  formatDate,
+} from '@/lib/project-status';
+import { getClientProject } from '@/lib/server/projects/queries';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+const project = await getClientProject(user);
+
+// El OWNER no usa el portal de clientes.
+if (user.role === 'OWNER') return Astro.redirect('/admin');
+
+const statusIndex = project ? PROJECT_STATUSES.indexOf(project.status) : -1;
+
+const threadMessages =
+  project?.messages.map((message) => ({
+    id: message.id,
+    content: message.content,
+    mine: message.senderId === user.id,
+    senderName:
+      message.senderId === user.id
+        ? 'Vos'
+        : `${message.sender.firstName} · becode`,
+    createdAt: new Date(message.createdAt).toLocaleString('es-AR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  })) ?? [];
+
+const fileItems =
+  project?.files.map((file) => ({
+    id: file.id,
+    filename: file.filename,
+    size: file.size,
+    canDelete: project.status === 'PENDIENTE',
+  })) ?? [];
+---
+
+<PortalLayout title="Mi proyecto">
+  <div class="portal-enter space-y-6">
+    <header class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-muted text-sm">
+          {project?.company.name ?? 'Bienvenido'}
+        </p>
+        <h1 class="font-display text-3xl font-bold tracking-tight">
+          Hola, {user.firstName} 👋
+        </h1>
+      </div>
+      {project && <StatusBadge status={project.status} />}
+    </header>
+
+    {
+      !project ? (
+        <section class="portal-card px-6 py-14 text-center sm:px-10">
+          <p class="text-signal font-mono text-xs tracking-widest uppercase">
+            Primer paso
+          </p>
+          <h2 class="font-display mt-3 text-2xl font-bold">
+            Contanos qué querés construir
+          </h2>
+          <p class="text-muted mx-auto mt-3 max-w-md text-sm">
+            Completá el brief inteligente en 3–5 minutos: con eso armamos la
+            propuesta y la documentación técnica de tu proyecto.
+          </p>
+          <a
+            href="/app/brief"
+            class="bg-signal text-surface hover:bg-signal-dark mt-6 inline-block rounded-[var(--radius-ui)] px-6 py-3 text-sm font-bold transition-colors"
+          >
+            Completar el brief →
+          </a>
+        </section>
+      ) : (
+        <>
+          <section class="portal-card p-6" aria-label="Estado del proyecto">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-display text-xl font-bold">{project.title}</h2>
+                <p class="text-muted mt-1 text-sm">
+                  Iniciado el {formatDate(project.createdAt)}
+                </p>
+              </div>
+              {project.status === 'PENDIENTE' && (
+                <a
+                  href="/app/brief"
+                  class="border-line hover:border-ink rounded-[var(--radius-ui)] border px-4 py-2 text-sm font-semibold transition-colors"
+                >
+                  Editar respuestas
+                </a>
+              )}
+            </div>
+
+            <ol
+              class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-7"
+              aria-label="Etapas"
+            >
+              {PROJECT_STATUSES.map((status, index) => (
+                <li
+                  class:list={[
+                    'rounded-[var(--radius-ui)] border px-2 py-2 text-center text-[0.65rem] font-semibold tracking-wide uppercase',
+                    index < statusIndex && 'border-line text-muted bg-paper',
+                    index === statusIndex &&
+                      'border-signal bg-signal/5 text-signal',
+                    index > statusIndex && 'border-line text-dim border-dashed',
+                  ]}
+                  aria-current={index === statusIndex ? 'step' : undefined}
+                >
+                  {STATUS_META[status].label}
+                </li>
+              ))}
+            </ol>
+
+            {project.status === 'PENDIENTE' && (
+              <p class="border-line text-muted mt-5 rounded-[var(--radius-ui)] border border-dashed px-4 py-3 text-sm">
+                Recibimos tu brief y lo estamos revisando. Te avisamos apenas lo
+                aprobemos — mientras tanto podés editar tus respuestas o subir
+                más material.
+              </p>
+            )}
+          </section>
+
+          <div class="grid gap-6 lg:grid-cols-3">
+            <section
+              class="portal-card p-6 lg:col-span-1"
+              aria-label="Checklist"
+            >
+              <h3 class="font-display mb-4 text-base font-bold">Checklist</h3>
+              <Checklist items={project.checklistItems} />
+            </section>
+
+            <section
+              class="portal-card p-6 lg:col-span-2"
+              aria-label="Historial"
+            >
+              <h3 class="font-display mb-4 text-base font-bold">Timeline</h3>
+              <Timeline events={project.timelineEvents} />
+            </section>
+          </div>
+
+          <div class="grid gap-6 lg:grid-cols-2">
+            <section class="portal-card p-6" aria-label="Archivos">
+              <h3 class="font-display mb-4 text-base font-bold">
+                Tus archivos
+              </h3>
+              <FileUploader client:visible files={fileItems} canUpload={true} />
+            </section>
+
+            <section class="portal-card p-6" aria-label="Mensajes">
+              <div class="mb-4 flex items-center justify-between">
+                <h3 class="font-display text-base font-bold">Mensajes</h3>
+                <span class="text-dim font-mono text-[0.65rem]">
+                  hola@becode.com.ar
+                </span>
+              </div>
+              <MessagesThread
+                client:visible
+                projectId={project.id}
+                messages={threadMessages}
+              />
+            </section>
+          </div>
+        </>
+      )
+    }
+  </div>
+</PortalLayout>

@@ -1,0 +1,33 @@
+---
+import RecoverForm from '@/components/react/auth/RecoverForm';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+
+export const prerender = false;
+
+const token = Astro.url.searchParams.get('token') ?? undefined;
+---
+
+<PortalLayout title="Recuperar contraseña" variant="auth">
+  <div class="portal-enter mx-auto max-w-md">
+    <div class="mb-8 text-center">
+      <h1 class="font-display text-3xl font-bold tracking-tight">
+        Recuperar contraseña
+      </h1>
+      <p class="text-muted mt-2 text-sm">
+        {
+          token
+            ? 'Elegí tu nueva contraseña.'
+            : 'Te enviamos un link para restablecerla.'
+        }
+      </p>
+    </div>
+    <div class="portal-card p-6 sm:p-8">
+      <RecoverForm client:load token={token} />
+    </div>
+    <p class="text-muted mt-6 text-center text-sm">
+      <a href="/login" class="hover:text-signal underline underline-offset-2">
+        Volver a iniciar sesión
+      </a>
+    </p>
+  </div>
+</PortalLayout>

@@ -1,0 +1,295 @@
+// Modelo de datos del CRM + Portal de Clientes de becode.
+// PostgreSQL en producción; para dev local ver docker-compose / README.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Usuarios y autenticación ────────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  CLIENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         Role     @default(CLIENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  projects            Project[]            @relation("ClientProjects")
+  messages            Message[]
+  files               FileUpload[]
+  internalNotes       InternalNote[]
+}
+
+model Session {
+  id        String   @id // hash del token; el token en claro solo viaja en la cookie
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// ── Empresas y proyectos ────────────────────────────────────────────────────
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users    User[]
+  projects Project[]
+}
+
+enum ProjectStatus {
+  PENDIENTE
+  APROBADO
+  DISENO
+  DESARROLLO
+  TESTING
+  DEPLOY
+  FINALIZADO
+}
+
+enum Priority {
+  BAJA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+model Project {
+  id         String        @id @default(cuid())
+  title      String
+  status     ProjectStatus @default(PENDIENTE)
+  priority   Priority      @default(MEDIA)
+  quote      Decimal?      @db.Decimal(12, 2) // cotización acordada (USD)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  approvedAt DateTime?
+  deliveredAt DateTime?
+
+  clientId  String
+  client    User    @relation("ClientProjects", fields: [clientId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  brief          Brief?
+  files          FileUpload[]
+  messages       Message[]
+  timelineEvents TimelineEvent[]
+  internalNotes  InternalNote[]
+  tags           Tag[]
+  prompts        GeneratedPrompt[]
+  aiInteractions AiInteraction[]
+  checklistItems ChecklistItem[]
+
+  @@index([status])
+  @@index([clientId])
+}
+
+// ── Brief inteligente (formulario) ──────────────────────────────────────────
+
+model Brief {
+  id        String  @id @default(cuid())
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  siteType    String // Landing, Corporativa, Ecommerce…
+  industry    String // Salud, Tecnología…
+  aesthetics  Json // string[] selección múltiple
+  colors      Json // string[]
+  feelings    Json // string[]
+  sections    Json // string[]
+  features    Json // string[]
+  hasLogo     Boolean
+  hasBrand    Boolean
+  hasDomain   Boolean
+  budgetRange String // "<500" | "500-1000" | "1000-3000" | "3000+"
+  urgency     String // "asap" | "1m" | "2m" | "flexible"
+  referenceUrls Json // string[]
+  comment     String?
+
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ── Archivos ────────────────────────────────────────────────────────────────
+
+model FileUpload {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploaderId String
+  uploader   User     @relation(fields: [uploaderId], references: [id])
+  filename   String // nombre original
+  storedName String   @unique // nombre en disco (aleatorio)
+  mimeType   String
+  size       Int
+  createdAt  DateTime @default(now())
+
+  @@index([projectId])
+}
+
+// ── Comunicación ────────────────────────────────────────────────────────────
+
+model Message {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User      @relation(fields: [senderId], references: [id])
+  content   String
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([projectId, createdAt])
+}
+
+// ── Timeline ────────────────────────────────────────────────────────────────
+
+enum TimelineEventType {
+  REGISTRO
+  BRIEF_ENVIADO
+  BRIEF_ACTUALIZADO
+  CLIENTE_APROBADO
+  PROMPTS_GENERADOS
+  PROYECTO_INICIADO
+  CAMBIO_ESTADO
+  ARCHIVO_SUBIDO
+  DEPLOY
+  ENTREGA
+  NOTA
+}
+
+model TimelineEvent {
+  id          String            @id @default(cuid())
+  projectId   String
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        TimelineEventType
+  title       String
+  description String?
+  createdAt   DateTime          @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+// ── Checklist del proyecto ──────────────────────────────────────────────────
+
+model ChecklistItem {
+  id        String    @id @default(cuid())
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  label     String
+  order     Int       @default(0)
+  doneAt    DateTime?
+
+  @@index([projectId])
+}
+
+// ── Notas internas y etiquetas ──────────────────────────────────────────────
+
+model InternalNote {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model Tag {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  color    String    @default("#d3311d")
+  projects Project[]
+}
+
+// ── IA: prompts generados, historial y repositorio de conocimiento ──────────
+
+enum PromptKind {
+  DISENO
+  FRONTEND
+  BACKEND
+  PRISMA
+  SEO
+  DEPLOY
+  TESTING
+  COMPLETO
+  ANALISIS
+}
+
+model GeneratedPrompt {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kind      PromptKind
+  content   String
+  model     String
+  createdAt DateTime   @default(now())
+
+  @@index([projectId, kind])
+}
+
+model AiInteraction {
+  id        String   @id @default(cuid())
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  feature   String // "chat" | "prompt-generation" | …
+  model     String
+  success   Boolean
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Plantillas de prompts exitosos reutilizables.
+model PromptTemplate {
+  id        String   @id @default(cuid())
+  title     String
+  category  String // "diseño" | "frontend" | …
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Biblioteca de referencias visuales / sitios ejemplo.
+model ReferenceItem {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  notes     String?
+  createdAt DateTime @default(now())
+}

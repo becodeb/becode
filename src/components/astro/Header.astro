@@ -37,6 +37,10 @@ import logoBe from '@/assets/logo-be.png';
       <a class="hover:text-signal transition-colors" href="#proceso">Proceso</a>
       <a class="hover:text-signal transition-colors" href="#equipo">Equipo</a>
       <a
+        class="border-ink hover:border-signal hover:text-signal rounded-[var(--radius-ui)] border px-4 py-2.5 transition-colors active:translate-y-px"
+        href="/registro">Comenzar proyecto</a
+      >
+      <a
         class="bg-signal text-surface hover:bg-signal-dark rounded-[var(--radius-ui)] px-4 py-2.5 transition-colors active:translate-y-px"
         href="#contacto">Hablemos</a
       >
@@ -64,7 +68,13 @@ import logoBe from '@/assets/logo-be.png';
             <a href="#equipo"><span>04</span>Equipo</a>
           </div>
           <a
-            class="bg-ink text-surface mt-5 flex items-center justify-between rounded-[var(--radius-ui)] px-5 py-4 font-bold"
+            class="bg-signal text-surface mt-5 flex items-center justify-between rounded-[var(--radius-ui)] px-5 py-4 font-bold"
+            href="/registro"
+          >
+            Comenzar proyecto <span aria-hidden="true">→&#xFE0E;</span>
+          </a>
+          <a
+            class="bg-ink text-surface mt-3 flex items-center justify-between rounded-[var(--radius-ui)] px-5 py-4 font-bold"
             href="#contacto"
           >
             Hablemos <span aria-hidden="true">↗&#xFE0E;</span>
@@ -239,8 +249,7 @@ import logoBe from '@/assets/logo-be.png';
 
   const pickBrandWord = () => {
     const options = brandWordPool.filter((word) => word !== lastBrandWord);
-    const word =
-      options[Math.floor(Math.random() * options.length)] ?? 'clear';
+    const word = options[Math.floor(Math.random() * options.length)] ?? 'clear';
     lastBrandWord = word;
     return word;
   };
@@ -263,7 +272,8 @@ import logoBe from '@/assets/logo-be.png';
   let runToken = 0; // bump to cancel any in-flight sequence
   let running = false;
 
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
   const typeDelay = () =>
     TYPE_MIN + Math.floor(Math.random() * (TYPE_MAX - TYPE_MIN));
 

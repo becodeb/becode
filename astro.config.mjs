@@ -18,6 +18,17 @@ export default defineConfig({
     image: { endpoint: { entrypoint: 'astro/assets/endpoint/dev' } },
   }),
   integrations: [react(), sitemap()],
+  security: {
+    // Sin esta lista, Astro descarta el header Host y arma las URLs del
+    // request como http://localhost (sin puerto), lo que rompe el chequeo
+    // CSRF de formularios (uploads) y cualquier URL absoluta generada.
+    allowedDomains: [
+      { hostname: 'becode.com.ar', protocol: 'https' },
+      { hostname: 'www.becode.com.ar', protocol: 'https' },
+      { hostname: 'localhost', protocol: 'http' },
+      { hostname: '127.0.0.1', protocol: 'http' },
+    ],
+  },
   vite: {
     plugins: [tailwindcss()],
     server: {
@@ -40,6 +51,13 @@ export default defineConfig({
         access: 'secret',
         optional: true,
         default: 'gpt-4o-mini',
+      }),
+      DATABASE_URL: envField.string({ context: 'server', access: 'secret' }),
+      UPLOADS_DIR: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+        default: './uploads',
       }),
     },
   },

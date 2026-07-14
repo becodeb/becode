@@ -1,26 +1,23 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
-import { OPENAI_API_KEY, OPENAI_MODEL } from 'astro:env/server';
-import companyContext from '@/data/company-context.md?raw';
+import {
+  AiServiceError,
+  aiModelName,
+  requestChatCompletion,
+} from '@/lib/server/ai/client';
+import { buildSiteAssistantPrompt } from '@/lib/server/ai/site-assistant';
+import { prisma } from '@/lib/server/db';
+import { errorJson, json, readJson } from '@/lib/server/http';
+import { createRateLimiter, rateLimitKey } from '@/lib/server/rate-limit';
 
 export const prerender = false;
 
 const MAX_MESSAGES = 16;
 const MAX_MESSAGE_LENGTH = 1000;
-const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 20;
 
-const requestLog = new Map<string, number[]>();
-
-function isRateLimited(key: string): boolean {
-  const now = Date.now();
-  const timestamps = (requestLog.get(key) ?? []).filter(
-    (time) => now - time < RATE_LIMIT_WINDOW_MS,
-  );
-  timestamps.push(now);
-  requestLog.set(key, timestamps);
-  return timestamps.length > RATE_LIMIT_MAX_REQUESTS;
-}
+const limiter = createRateLimiter({
+  windowMs: 5 * 60 * 1000,
+  maxRequests: 20,
+});
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -47,121 +44,57 @@ function parseMessages(body: unknown): ChatMessage[] | null {
   return messages;
 }
 
-async function buildSystemPrompt(): Promise<string> {
-  const projects = (await getCollection('projects')).sort(
-    (a, b) => a.data.order - b.data.order,
-  );
-
-  const projectLines = projects.map((project) => {
-    const { name, description, stack, category, status, url } = project.data;
-    return `- ${name} (${category}, ${status}) — ${description} · Stack: ${stack.join(', ')} · ${url}`;
-  });
-
-  return [
-    companyContext.trim(),
-    '## Proyectos y productos de becode',
-    projectLines.join('\n'),
-  ].join('\n\n');
+async function logInteraction(success: boolean, error?: string): Promise<void> {
+  // El chat público no debe romperse si la base de datos no está disponible.
+  try {
+    await prisma.aiInteraction.create({
+      data: {
+        feature: 'chat',
+        model: aiModelName(),
+        success,
+        error: error ?? null,
+      },
+    });
+  } catch {
+    // Historial best-effort.
+  }
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
-  let rateLimitKey = 'unknown';
-  try {
-    rateLimitKey = clientAddress;
-  } catch {
-    // clientAddress puede no estar disponible según el modo del adapter.
-  }
-
-  if (isRateLimited(rateLimitKey)) {
-    return new Response(
-      JSON.stringify({
-        error: 'Demasiadas consultas. Probá de nuevo en unos minutos.',
-      }),
-      { status: 429, headers: { 'Content-Type': 'application/json' } },
+export const POST: APIRoute = async (context) => {
+  if (limiter.isLimited(rateLimitKey(context))) {
+    return errorJson(
+      'Demasiadas consultas. Probá de nuevo en unos minutos.',
+      429,
     );
   }
 
-  if (!OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY no está configurada.');
-    return new Response(
-      JSON.stringify({
-        error: 'El asistente no está disponible en este momento.',
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
-    );
-  }
-
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(JSON.stringify({ error: 'Cuerpo inválido.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  const body = await readJson(context.request);
+  if (body === null) return errorJson('Cuerpo inválido.', 400);
 
   const messages = parseMessages(body);
-  if (!messages) {
-    return new Response(JSON.stringify({ error: 'Mensaje inválido.' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  if (!messages) return errorJson('Mensaje inválido.', 400);
 
-  const systemPrompt = await buildSystemPrompt();
+  const systemPrompt = await buildSiteAssistantPrompt();
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        temperature: 0.4,
-        max_completion_tokens: 500,
-        messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      }),
+    const reply = await requestChatCompletion({
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      temperature: 0.4,
+      maxTokens: 500,
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error('Error de OpenAI:', response.status, errorBody);
-      return new Response(
-        JSON.stringify({
-          error: 'No pudimos generar una respuesta. Probá de nuevo.',
-        }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const data = (await response.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const reply = data.choices?.[0]?.message?.content?.trim();
-
-    if (!reply) {
-      return new Response(
-        JSON.stringify({
-          error: 'No pudimos generar una respuesta. Probá de nuevo.',
-        }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } },
-      );
-    }
-
-    return new Response(JSON.stringify({ reply }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    void logInteraction(true);
+    return json({ reply });
   } catch (error) {
-    console.error('Error llamando a OpenAI:', error);
-    return new Response(
-      JSON.stringify({
-        error: 'No pudimos generar una respuesta. Probá de nuevo.',
-      }),
-      { status: 502, headers: { 'Content-Type': 'application/json' } },
+    void logInteraction(
+      false,
+      error instanceof Error ? error.message : 'Error desconocido',
     );
+
+    if (error instanceof AiServiceError && error.status === 500) {
+      return errorJson('El asistente no está disponible en este momento.', 500);
+    }
+    console.error('Error llamando al servicio de IA:', error);
+    return errorJson('No pudimos generar una respuesta. Probá de nuevo.', 502);
   }
 };

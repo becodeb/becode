@@ -1,0 +1,98 @@
+---
+import type { ChecklistItem } from '@/generated/prisma/client';
+
+interface Props {
+  items: ChecklistItem[];
+  /** Si es true, los ítems se pueden marcar (solo CRM). */
+  interactive?: boolean;
+}
+
+const { items, interactive = false } = Astro.props;
+const done = items.filter((item) => item.doneAt).length;
+---
+
+{
+  items.length === 0 ? (
+    <p class="text-muted text-sm">
+      El checklist se crea cuando aprobamos el proyecto.
+    </p>
+  ) : (
+    <div>
+      <div class="mb-3 flex items-center justify-between">
+        <p class="text-muted text-xs font-semibold tracking-wide uppercase">
+          Progreso
+        </p>
+        <p class="font-mono text-xs">
+          {done}/{items.length}
+        </p>
+      </div>
+      <div class="bg-line mb-4 h-1.5 overflow-hidden rounded-full">
+        <div
+          class="bg-signal h-full rounded-full transition-all"
+          style={`width: ${items.length ? Math.round((done / items.length) * 100) : 0}%`}
+        />
+      </div>
+      <ul class="space-y-2">
+        {items.map((item) => (
+          <li class="flex items-center gap-2.5 text-sm">
+            {interactive ? (
+              <button
+                type="button"
+                data-checklist-item={item.id}
+                aria-pressed={Boolean(item.doneAt)}
+                class:list={[
+                  'grid h-4.5 w-4.5 shrink-0 cursor-pointer place-items-center rounded border transition-colors',
+                  item.doneAt
+                    ? 'bg-signal border-signal text-surface'
+                    : 'border-line hover:border-ink bg-surface',
+                ]}
+              >
+                {item.doneAt && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="10"
+                    height="10"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 13l4 4L19 7"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                )}
+              </button>
+            ) : (
+              <span
+                class:list={[
+                  'grid h-4.5 w-4.5 shrink-0 place-items-center rounded border',
+                  item.doneAt
+                    ? 'bg-signal border-signal text-surface'
+                    : 'border-line bg-surface',
+                ]}
+                aria-hidden="true"
+              >
+                {item.doneAt && (
+                  <svg viewBox="0 0 24 24" width="10" height="10">
+                    <path
+                      d="M5 13l4 4L19 7"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                )}
+              </span>
+            )}
+            <span class:list={[item.doneAt && 'text-muted line-through']}>
+              {item.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

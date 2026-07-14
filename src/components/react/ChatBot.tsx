@@ -62,8 +62,16 @@ export default function ChatBot() {
       const launcher = launcherRef.current;
       if (!launcher) return;
       const rect = launcher.getBoundingClientRect();
-      const dx = Math.max(rect.left - event.clientX, 0, event.clientX - rect.right);
-      const dy = Math.max(rect.top - event.clientY, 0, event.clientY - rect.bottom);
+      const dx = Math.max(
+        rect.left - event.clientX,
+        0,
+        event.clientX - rect.right,
+      );
+      const dy = Math.max(
+        rect.top - event.clientY,
+        0,
+        event.clientY - rect.bottom,
+      );
       nearPointer = Math.hypot(dx, dy) < ACTIVATION_RADIUS;
       sync();
     };
@@ -77,7 +85,9 @@ export default function ChatBot() {
       sync();
     };
 
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointermove', handlePointerMove, {
+      passive: true,
+    });
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => {

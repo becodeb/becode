@@ -25,7 +25,7 @@ export interface HeroShowcaseProps {
 const ROTATION_MS = 4500;
 // Every card moves for the same duration on each shuffle so the whole deck
 // reads as one gesture.
-const FLIGHT_DURATION_S = .55;
+const FLIGHT_DURATION_S = 0.55;
 const SWAP_DURATION_S = FLIGHT_DURATION_S;
 const RISE_DURATION_S = FLIGHT_DURATION_S;
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -202,16 +202,13 @@ function ShowcaseCard({
     (position === 'back' || position === 'hidden');
   const promoted =
     previousPosition.current === 'middle' && position === 'front';
-  const stepped =
-    previousPosition.current === 'back' && position === 'middle';
+  const stepped = previousPosition.current === 'back' && position === 'middle';
 
   useEffect(() => {
-    if (
-      !(
-        previousPosition.current === 'front' &&
-        (position === 'back' || position === 'hidden')
-      )
-    ) {
+    if (!(
+      previousPosition.current === 'front' &&
+      (position === 'back' || position === 'hidden')
+    )) {
       previousPosition.current = position;
       return;
     }
@@ -293,18 +290,50 @@ function ShowcaseCard({
         inFlight
           ? {
               default: { duration: FLIGHT_DURATION_S, ease: EASE },
-              x: seg(FLIGHT_DURATION_S, [0, 0.52, 0.78, 1], ['easeOut', 'easeInOut', 'easeOut']),
-              y: seg(FLIGHT_DURATION_S, [0, 0.42, 0.72, 1], ['easeOut', 'easeIn', 'easeOut']),
-              rotateZ: seg(FLIGHT_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
-              scale: seg(FLIGHT_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
+              x: seg(
+                FLIGHT_DURATION_S,
+                [0, 0.52, 0.78, 1],
+                ['easeOut', 'easeInOut', 'easeOut'],
+              ),
+              y: seg(
+                FLIGHT_DURATION_S,
+                [0, 0.42, 0.72, 1],
+                ['easeOut', 'easeIn', 'easeOut'],
+              ),
+              rotateZ: seg(
+                FLIGHT_DURATION_S,
+                [0, 0.48, 0.76, 1],
+                ['easeOut', 'easeInOut', 'easeOut'],
+              ),
+              scale: seg(
+                FLIGHT_DURATION_S,
+                [0, 0.48, 0.76, 1],
+                ['easeOut', 'easeInOut', 'easeOut'],
+              ),
             }
           : promoted || stepped
             ? {
                 default: { duration: RISE_DURATION_S, ease: EASE },
-                x: seg(RISE_DURATION_S, [0, 0.48, 0.76, 1], ['easeOut', 'easeInOut', 'easeOut']),
-                y: seg(RISE_DURATION_S, [0, 0.4, 0.72, 1], ['easeOut', 'easeInOut', 'easeOut']),
-                rotateZ: seg(RISE_DURATION_S, [0, 0.44, 0.74, 1], ['easeOut', 'easeInOut', 'easeOut']),
-                scale: seg(RISE_DURATION_S, [0, 0.44, 0.74, 1], ['easeOut', 'easeInOut', 'easeOut']),
+                x: seg(
+                  RISE_DURATION_S,
+                  [0, 0.48, 0.76, 1],
+                  ['easeOut', 'easeInOut', 'easeOut'],
+                ),
+                y: seg(
+                  RISE_DURATION_S,
+                  [0, 0.4, 0.72, 1],
+                  ['easeOut', 'easeInOut', 'easeOut'],
+                ),
+                rotateZ: seg(
+                  RISE_DURATION_S,
+                  [0, 0.44, 0.74, 1],
+                  ['easeOut', 'easeInOut', 'easeOut'],
+                ),
+                scale: seg(
+                  RISE_DURATION_S,
+                  [0, 0.44, 0.74, 1],
+                  ['easeOut', 'easeInOut', 'easeOut'],
+                ),
               }
             : { default: { duration: SWAP_DURATION_S, ease: EASE } }
       }

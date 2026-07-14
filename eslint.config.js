@@ -4,7 +4,11 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['dist/', '.astro/'] },
+  { ignores: ['dist/', '.astro/', 'src/generated/'] },
+  {
+    files: ['**/*.{js,mjs}'],
+    languageOptions: { globals: globals.node },
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
