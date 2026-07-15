@@ -1,16 +1,58 @@
-<footer class="border-line border-t py-8">
-  <div
-    class="shell flex flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between"
-  >
-    <p class="font-display text-lg font-bold">
-      be<span class="text-signal">/</span>code
-    </p>
-    <p class="text-muted">© {new Date().getFullYear()} becode.com.ar</p>
-    <div class="flex flex-wrap gap-x-5 gap-y-2 font-semibold">
-      <a class="hover:text-signal" href="/#inicio">Inicio</a>
-      <a class="hover:text-signal" href="/#proyectos">Proyectos</a>
-      <a class="hover:text-signal" href="/terminos-y-condiciones"> Términos </a>
-      <a class="hover:text-signal" href="mailto:hola@becode.com.ar">Email</a>
+---
+interface Props {
+  showLegalNote?: boolean;
+}
+
+const { showLegalNote = true } = Astro.props;
+---
+
+<footer class="border-line border-t">
+  {
+    showLegalNote && (
+      <div class="border-line border-b py-6">
+        <div class="shell flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-start gap-3">
+            <span
+              class="border-line text-signal grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-ui)] border font-mono text-[0.65rem] font-semibold"
+              aria-hidden="true"
+            >
+              DOC
+            </span>
+            <div>
+              <p class="font-display font-bold">Condiciones documentadas</p>
+              <p class="text-muted mt-0.5 text-sm leading-5">
+                Contratación, privacidad y propiedad intelectual, sin letra
+                chica.
+              </p>
+            </div>
+          </div>
+          <a
+            class="hover:text-signal shrink-0 text-sm font-bold underline underline-offset-4"
+            href="/terminos-y-condiciones"
+          >
+            Ver términos y condiciones ↗︎
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  <div class="py-8">
+    <div
+      class="shell flex flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="font-display text-lg font-bold">
+        be<span class="text-signal">/</span>code
+      </p>
+      <p class="text-muted">© {new Date().getFullYear()} becode.com.ar</p>
+      <div class="flex flex-wrap gap-x-5 gap-y-2 font-semibold">
+        <a class="hover:text-signal" href="/#inicio">Inicio</a>
+        <a class="hover:text-signal" href="/#proyectos">Proyectos</a>
+        <a class="hover:text-signal" href="/terminos-y-condiciones">
+          Términos y condiciones
+        </a>
+        <a class="hover:text-signal" href="mailto:hola@becode.com.ar">Email</a>
+      </div>
     </div>
   </div>
 </footer>
