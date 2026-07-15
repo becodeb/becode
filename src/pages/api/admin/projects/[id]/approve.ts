@@ -7,14 +7,13 @@ import { recordEvent } from '@/lib/server/projects/timeline';
 export const prerender = false;
 
 const DEFAULT_CHECKLIST = [
-  'Kickoff y planificación',
-  'Diseño UI aprobado',
-  'Desarrollo frontend',
-  'Desarrollo backend',
-  'Contenido cargado',
-  'Testing completo',
-  'Deploy a producción',
-  'Entrega final',
+  'Definimos el alcance y los próximos pasos',
+  'Diseñamos la experiencia y el estilo visual',
+  'Construimos las pantallas y funciones',
+  'Cargamos y revisamos el contenido',
+  'Probamos todo en celular y computadora',
+  'Publicamos el proyecto',
+  'Entregamos y acompañamos la salida',
 ];
 
 export const POST: APIRoute = async (context) => {

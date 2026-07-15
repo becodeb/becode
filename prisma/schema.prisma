@@ -87,14 +87,14 @@ enum Priority {
 }
 
 model Project {
-  id         String        @id @default(cuid())
-  title      String
-  status     ProjectStatus @default(PENDIENTE)
-  priority   Priority      @default(MEDIA)
-  quote      Decimal?      @db.Decimal(12, 2) // cotización acordada (USD)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  approvedAt DateTime?
+  id          String        @id @default(cuid())
+  title       String
+  status      ProjectStatus @default(PENDIENTE)
+  priority    Priority      @default(MEDIA)
+  quote       Decimal?      @db.Decimal(12, 2) // cotización acordada (USD)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  approvedAt  DateTime?
   deliveredAt DateTime?
 
   clientId  String
@@ -123,20 +123,34 @@ model Brief {
   projectId String  @unique
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  siteType    String // Landing, Corporativa, Ecommerce…
-  industry    String // Salud, Tecnología…
-  aesthetics  Json // string[] selección múltiple
-  colors      Json // string[]
-  feelings    Json // string[]
-  sections    Json // string[]
-  features    Json // string[]
-  hasLogo     Boolean
-  hasBrand    Boolean
-  hasDomain   Boolean
-  budgetRange String // "<500" | "500-1000" | "1000-3000" | "3000+"
-  urgency     String // "asap" | "1m" | "2m" | "flexible"
-  referenceUrls Json // string[]
-  comment     String?
+  siteType          String // Landing, Corporativa, Ecommerce…
+  industry          String // Rubro del cliente
+  projectSummary    String  @default("")
+  mainGoal          String  @default("")
+  targetAudience    String  @default("")
+  primaryAction     String  @default("")
+  successMetric     String  @default("")
+  aesthetics        Json // string[] selección múltiple
+  colors            Json // string[]
+  feelings          Json // string[]
+  avoidances        String?
+  sections          Json // string[]
+  features          Json // string[]
+  contentStatus     String  @default("")
+  contentManagement String  @default("")
+  language          String  @default("")
+  hasLogo           Boolean
+  hasBrand          Boolean
+  hasDomain         Boolean
+  existingSiteUrl   String?
+  budgetRange       String // "<500" | "500-1000" | "1000-3000" | "3000+"
+  urgency           String // "asap" | "1m" | "2m" | "flexible"
+  referenceUrls     Json // string[]
+  referenceNotes    String?
+  materialLink      String?
+  contactPreference String  @default("Email")
+  phone             String?
+  comment           String?
 
   submittedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt

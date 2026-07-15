@@ -18,8 +18,16 @@ const adminNav = [
   { href: '/admin/biblioteca', label: 'Biblioteca' },
 ];
 
+const appNav = [
+  { href: '/app', label: 'Resumen' },
+  { href: '/app/archivos', label: 'Archivos' },
+  { href: '/app/mensajes', label: 'Mensajes' },
+];
+
 const isActive = (href: string) =>
   href === '/admin' ? currentPath === '/admin' : currentPath.startsWith(href);
+const isAppActive = (href: string) =>
+  href === '/app' ? currentPath === '/app' : currentPath.startsWith(href);
 ---
 
 <!doctype html>
@@ -68,6 +76,29 @@ const isActive = (href: string) =>
                     class:list={[
                       'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm transition-colors',
                       isActive(item.href)
+                        ? 'bg-ink text-surface'
+                        : 'text-muted hover:text-ink',
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </nav>
+            )
+          }
+          {
+            variant === 'app' && user?.role === 'CLIENT' && (
+              <nav
+                aria-label="Secciones del proyecto"
+                class="hidden items-center gap-1 sm:flex"
+              >
+                {appNav.map((item) => (
+                  <a
+                    href={item.href}
+                    aria-current={isAppActive(item.href) ? 'page' : undefined}
+                    class:list={[
+                      'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm transition-colors',
+                      isAppActive(item.href)
                         ? 'bg-ink text-surface'
                         : 'text-muted hover:text-ink',
                     ]}
@@ -127,6 +158,27 @@ const isActive = (href: string) =>
                 class:list={[
                   'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm whitespace-nowrap',
                   isActive(item.href) ? 'bg-ink text-surface' : 'text-muted',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        )
+      }
+      {
+        variant === 'app' && user?.role === 'CLIENT' && (
+          <nav
+            aria-label="Secciones del proyecto"
+            class="border-line flex gap-1 overflow-x-auto border-t px-4 py-2 sm:hidden"
+          >
+            {appNav.map((item) => (
+              <a
+                href={item.href}
+                aria-current={isAppActive(item.href) ? 'page' : undefined}
+                class:list={[
+                  'rounded-[var(--radius-ui)] px-3 py-1.5 text-sm whitespace-nowrap',
+                  isAppActive(item.href) ? 'bg-ink text-surface' : 'text-muted',
                 ]}
               >
                 {item.label}

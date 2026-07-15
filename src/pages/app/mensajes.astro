@@ -1,0 +1,71 @@
+---
+import MessagesThread from '@/components/react/portal/MessagesThread';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import { getClientProject } from '@/lib/server/projects/queries';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+if (user.role === 'OWNER') return Astro.redirect('/admin');
+
+const project = await getClientProject(user);
+if (!project) return Astro.redirect('/app/brief');
+
+const threadMessages = project.messages.map((message) => ({
+  id: message.id,
+  content: message.content,
+  mine: message.senderId === user.id,
+  senderName:
+    message.senderId === user.id
+      ? 'Vos'
+      : `${message.sender.firstName} · becode`,
+  createdAt: new Date(message.createdAt).toLocaleString('es-AR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }),
+}));
+---
+
+<PortalLayout title="Mensajes">
+  <div class="portal-enter mx-auto max-w-3xl space-y-6">
+    <header>
+      <p class="text-signal font-mono text-xs tracking-widest uppercase">
+        Conversación del proyecto
+      </p>
+      <h1 class="font-display mt-2 text-3xl font-bold tracking-tight">
+        Mensajes con becode
+      </h1>
+      <p class="text-muted mt-2 text-sm leading-6">
+        Usá este espacio para decisiones y consultas del proyecto. Así queda
+        todo junto y no se pierde entre conversaciones.
+      </p>
+    </header>
+
+    <div
+      class="border-line bg-paper flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-ui)] border px-4 py-3 text-sm"
+    >
+      <div>
+        <span class="text-muted">Contacto preferido:</span>{' '}
+        <strong>{project.brief?.contactPreference ?? 'Email'}</strong>
+        {
+          project.brief?.phone && (
+            <span class="text-muted"> · {project.brief.phone}</span>
+          )
+        }
+      </div>
+      <a href="mailto:hola@becode.com.ar" class="text-signal font-semibold">
+        hola@becode.com.ar
+      </a>
+    </div>
+
+    <section class="portal-card p-5 sm:p-6" aria-label="Mensajes">
+      <MessagesThread
+        client:visible
+        projectId={project.id}
+        messages={threadMessages}
+      />
+    </section>
+  </div>
+</PortalLayout>

@@ -3,9 +3,14 @@ import {
   AESTHETICS,
   BUDGET_RANGES,
   COLORS,
+  CONTACT_VALUES,
+  CONTENT_MANAGEMENT_OPTIONS,
+  CONTENT_STATUSES,
   FEATURES,
   FEELINGS,
-  INDUSTRIES,
+  GOALS,
+  LANGUAGE_OPTIONS,
+  PRIMARY_ACTIONS,
   SECTIONS,
   SITE_TYPES,
   URGENCY_VALUES,
@@ -47,27 +52,58 @@ const multi = <T extends readonly [string, ...string[]]>(
   max: number,
 ) => z.array(z.enum(values)).max(max).default([]);
 
-export const briefSchema = z.object({
-  siteType: z.enum(SITE_TYPES),
-  industry: z.enum(INDUSTRIES),
-  aesthetics: multi(AESTHETICS, AESTHETICS.length),
-  colors: multi(COLORS, COLORS.length),
-  feelings: multi(FEELINGS, FEELINGS.length),
-  sections: multi(SECTIONS, SECTIONS.length),
-  features: multi(FEATURES, FEATURES.length),
-  hasLogo: z.boolean(),
-  hasBrand: z.boolean(),
-  hasDomain: z.boolean(),
-  budgetRange: z.enum(BUDGET_RANGES),
-  urgency: z.enum(URGENCY_VALUES as [string, ...string[]]),
-  referenceUrls: z.array(z.string().trim().url().max(500)).max(10).default([]),
-  comment: z
-    .string()
-    .trim()
-    .max(2000)
-    .optional()
-    .or(z.literal('').transform(() => undefined)),
-});
+export const briefSchema = z
+  .object({
+    siteType: z.enum(SITE_TYPES),
+    industry: trimmed(120),
+    projectSummary: trimmed(1200).refine((value) => value.length >= 30),
+    mainGoal: z.enum(GOALS),
+    targetAudience: trimmed(800).refine((value) => value.length >= 10),
+    primaryAction: z.enum(PRIMARY_ACTIONS),
+    successMetric: trimmed(600).refine((value) => value.length >= 10),
+    aesthetics: multi(AESTHETICS, 2).refine((values) => values.length > 0),
+    colors: multi(COLORS, 3),
+    feelings: multi(FEELINGS, 3).refine((values) => values.length > 0),
+    avoidances: z.string().trim().max(600).optional(),
+    sections: multi(SECTIONS, SECTIONS.length).refine(
+      (values) => values.length > 0,
+    ),
+    features: multi(FEATURES, FEATURES.length),
+    contentStatus: z.enum(CONTENT_STATUSES),
+    contentManagement: z.enum(CONTENT_MANAGEMENT_OPTIONS),
+    language: z.enum(LANGUAGE_OPTIONS),
+    hasLogo: z.boolean(),
+    hasBrand: z.boolean(),
+    hasDomain: z.boolean(),
+    existingSiteUrl: z.string().trim().url().max(500).optional(),
+    budgetRange: z.enum(BUDGET_RANGES),
+    urgency: z.enum(URGENCY_VALUES as [string, ...string[]]),
+    referenceUrls: z
+      .array(z.string().trim().url().max(500))
+      .max(10)
+      .default([]),
+    materialLink: z.string().trim().url().max(500).optional(),
+    contactPreference: z.enum(CONTACT_VALUES),
+    phone: z
+      .string()
+      .trim()
+      .max(30)
+      .regex(/^[+()\d\s-]*$/, 'Teléfono inválido.')
+      .optional(),
+    referenceNotes: z.string().trim().max(800).optional(),
+    comment: z
+      .string()
+      .trim()
+      .max(2000)
+      .optional()
+      .or(z.literal('').transform(() => undefined)),
+  })
+  .refine(
+    (data) =>
+      data.contactPreference === 'Email' ||
+      (data.phone?.replace(/\D/g, '').length ?? 0) >= 7,
+    { message: 'Ingresá un teléfono de contacto.', path: ['phone'] },
+  );
 
 export const messageSchema = z.object({
   projectId: z.string().min(1),

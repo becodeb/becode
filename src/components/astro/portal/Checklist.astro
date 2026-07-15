@@ -3,96 +3,124 @@ import type { ChecklistItem } from '@/generated/prisma/client';
 
 interface Props {
   items: ChecklistItem[];
-  /** Si es true, los ítems se pueden marcar (solo CRM). */
+  /** Si es true, los ítems se pueden marcar desde el CRM. */
   interactive?: boolean;
 }
 
 const { items, interactive = false } = Astro.props;
 const done = items.filter((item) => item.doneAt).length;
+const percentage = items.length ? Math.round((done / items.length) * 100) : 0;
+
+const friendlyLabels: Record<string, string> = {
+  'Kickoff y planificación': 'Definimos el alcance y los próximos pasos',
+  'Diseño UI aprobado': 'Diseñamos la experiencia y el estilo visual',
+  'Desarrollo frontend': 'Construimos las pantallas principales',
+  'Desarrollo backend': 'Conectamos las funciones y la información',
+  'Contenido cargado': 'Cargamos y revisamos el contenido',
+  'Testing completo': 'Probamos todo antes de publicar',
+  'Deploy a producción': 'Publicamos el proyecto',
+  'Entrega final': 'Entregamos y acompañamos la salida',
+};
 ---
 
 {
   items.length === 0 ? (
-    <p class="text-muted text-sm">
-      El checklist se crea cuando aprobamos el proyecto.
-    </p>
+    <div class="border-line border-t pt-5">
+      <p class="font-display font-semibold">
+        El plan aparece después de aprobar
+      </p>
+      <p class="text-muted mt-1 text-sm leading-6">
+        Primero revisamos el brief. Cuando confirmamos el proyecto, vas a ver
+        acá cada paso, qué terminamos y qué sigue.
+      </p>
+      <ol class="text-muted mt-5 grid gap-4 text-xs sm:grid-cols-3">
+        <li class="border-line flex items-center gap-2 border-t pt-3">
+          <span class="text-signal font-mono">01</span>
+          <span>Definición</span>
+        </li>
+        <li class="border-line flex items-center gap-2 border-t pt-3">
+          <span class="text-signal font-mono">02</span>
+          <span>Construcción</span>
+        </li>
+        <li class="border-line flex items-center gap-2 border-t pt-3">
+          <span class="text-signal font-mono">03</span>
+          <span>Publicación</span>
+        </li>
+      </ol>
+    </div>
   ) : (
     <div>
-      <div class="mb-3 flex items-center justify-between">
-        <p class="text-muted text-xs font-semibold tracking-wide uppercase">
-          Progreso
-        </p>
-        <p class="font-mono text-xs">
-          {done}/{items.length}
+      <div class="flex items-end justify-between gap-4">
+        <div>
+          <p class="text-signal font-mono text-[0.65rem] tracking-widest uppercase">
+            Avance general
+          </p>
+          <p class="font-display mt-1 text-3xl font-bold">{percentage}%</p>
+        </div>
+        <p class="text-muted max-w-xs text-right text-xs leading-5">
+          {done === items.length
+            ? 'Todos los pasos están completos.'
+            : `${items.length - done} ${items.length - done === 1 ? 'paso pendiente' : 'pasos pendientes'}. Actualizamos esto a medida que avanzamos.`}
         </p>
       </div>
-      <div class="bg-line mb-4 h-1.5 overflow-hidden rounded-full">
+
+      <div
+        class="bg-line mt-4 h-2 overflow-hidden rounded-full"
+        role="progressbar"
+        aria-label="Avance del proyecto"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={percentage}
+      >
         <div
-          class="bg-signal h-full rounded-full transition-all"
-          style={`width: ${items.length ? Math.round((done / items.length) * 100) : 0}%`}
+          class="bg-signal h-full rounded-full transition-all duration-500"
+          style={`width: ${percentage}%`}
         />
       </div>
-      <ul class="space-y-2">
-        {items.map((item) => (
-          <li class="flex items-center gap-2.5 text-sm">
-            {interactive ? (
-              <button
-                type="button"
-                data-checklist-item={item.id}
-                aria-pressed={Boolean(item.doneAt)}
-                class:list={[
-                  'grid h-4.5 w-4.5 shrink-0 cursor-pointer place-items-center rounded border transition-colors',
-                  item.doneAt
-                    ? 'bg-signal border-signal text-surface'
-                    : 'border-line hover:border-ink bg-surface',
-                ]}
-              >
-                {item.doneAt && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="10"
-                    height="10"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M5 13l4 4L19 7"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                )}
-              </button>
-            ) : (
-              <span
-                class:list={[
-                  'grid h-4.5 w-4.5 shrink-0 place-items-center rounded border',
-                  item.doneAt
-                    ? 'bg-signal border-signal text-surface'
-                    : 'border-line bg-surface',
-                ]}
-                aria-hidden="true"
-              >
-                {item.doneAt && (
-                  <svg viewBox="0 0 24 24" width="10" height="10">
-                    <path
-                      d="M5 13l4 4L19 7"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                )}
+
+      <ol class="border-line mt-6 border-t">
+        {items.map((item, index) => {
+          const complete = Boolean(item.doneAt);
+          return (
+            <li class="border-line grid grid-cols-[2rem_1fr_auto] items-center gap-3 border-b py-3.5">
+              <span class="text-dim font-mono text-[0.65rem]">
+                {String(index + 1).padStart(2, '0')}
               </span>
-            )}
-            <span class:list={[item.doneAt && 'text-muted line-through']}>
-              {item.label}
-            </span>
-          </li>
-        ))}
-      </ul>
+              <span
+                class:list={['text-sm font-medium', complete && 'text-muted']}
+              >
+                {friendlyLabels[item.label] ?? item.label}
+              </span>
+              {interactive ? (
+                <button
+                  type="button"
+                  data-checklist-item={item.id}
+                  aria-pressed={complete}
+                  class:list={[
+                    'rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold transition-colors',
+                    complete
+                      ? 'bg-signal border-signal text-surface'
+                      : 'border-line hover:border-ink text-muted',
+                  ]}
+                >
+                  {complete ? 'Listo' : 'Marcar listo'}
+                </button>
+              ) : (
+                <span
+                  class:list={[
+                    'rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold',
+                    complete
+                      ? 'bg-signal/8 border-signal/30 text-signal'
+                      : 'border-line text-dim',
+                  ]}
+                >
+                  {complete ? 'Listo' : 'Pendiente'}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
     </div>
   )
 }

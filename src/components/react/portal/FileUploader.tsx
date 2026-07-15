@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Upload, X } from 'lucide-react';
 import { requestJson } from '@/lib/client/api';
 
 interface FileItem {
@@ -95,9 +96,10 @@ export default function FileUploader({
                   type="button"
                   onClick={() => handleDelete(file.id)}
                   aria-label={`Eliminar ${file.filename}`}
-                  className="text-muted hover:text-signal shrink-0 text-xs"
+                  className="text-muted hover:text-signal grid h-7 w-7 shrink-0 place-items-center rounded transition-colors"
+                  title="Eliminar archivo"
                 >
-                  ✕
+                  <X size={14} aria-hidden="true" />
                 </button>
               )}
             </li>
@@ -125,11 +127,10 @@ export default function FileUploader({
             type="button"
             disabled={uploading}
             onClick={() => inputRef.current?.click()}
-            className="border-line hover:border-ink text-muted hover:text-ink w-full rounded-[var(--radius-ui)] border border-dashed px-4 py-3 text-sm transition-colors disabled:opacity-50"
+            className="border-line hover:border-ink text-muted hover:text-ink flex w-full items-center justify-center gap-2 rounded-[var(--radius-ui)] border border-dashed px-4 py-4 text-sm font-semibold transition-colors disabled:opacity-50"
           >
-            {uploading
-              ? 'Subiendo…'
-              : '+ Subir logo, manual de marca, PDFs, imágenes…'}
+            <Upload size={16} aria-hidden="true" />
+            {uploading ? 'Subiendo…' : 'Elegir archivos'}
           </button>
           <p className="text-dim text-xs">Hasta 25 MB por archivo.</p>
         </>

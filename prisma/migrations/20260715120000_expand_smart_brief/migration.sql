@@ -1,0 +1,15 @@
+ALTER TABLE "Brief"
+ADD COLUMN "projectSummary" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "mainGoal" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "targetAudience" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "primaryAction" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "successMetric" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "avoidances" TEXT,
+ADD COLUMN "contentStatus" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "contentManagement" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "language" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "existingSiteUrl" TEXT,
+ADD COLUMN "referenceNotes" TEXT,
+ADD COLUMN "materialLink" TEXT,
+ADD COLUMN "contactPreference" TEXT NOT NULL DEFAULT 'Email',
+ADD COLUMN "phone" TEXT;

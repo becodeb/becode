@@ -5,7 +5,7 @@ import { errorJson, json } from '@/lib/server/http';
 
 export const prerender = false;
 
-/** Regenera la documentación IA de un proyecto ya aprobado. */
+/** Regenera el prompt maestro de un proyecto ya aprobado. */
 export const POST: APIRoute = async (context) => {
   const projectId = context.params.id ?? '';
   const project = await prisma.project.findUnique({

@@ -6,6 +6,7 @@ import Contact from '@/components/astro/Contact.astro';
 import Footer from '@/components/astro/Footer.astro';
 import Header from '@/components/astro/Header.astro';
 import Hero from '@/components/astro/Hero.astro';
+import Legal from '@/components/astro/Legal.astro';
 import Process from '@/components/astro/Process.astro';
 import ProjectSection from '@/components/astro/ProjectSection.astro';
 import Services from '@/components/astro/Services.astro';
@@ -28,6 +29,7 @@ const projects = (await getCollection('projects')).sort(
     <Services />
     <Process />
     <Team />
+    <Legal />
     <Contact />
   </main>
   <Footer />

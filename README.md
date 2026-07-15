@@ -8,15 +8,15 @@ construido con Astro 5, React Islands, Tailwind CSS v4, Prisma y PostgreSQL.
 - **Landing** (`/`): la página comercial de siempre, prerenderizada. El botón
   "Comenzar proyecto" lleva al registro.
 - **Portal de clientes** (`/app`): el cliente se registra, completa el brief
-  inteligente en 3–5 minutos, sube archivos, sigue el estado del proyecto
+  inteligente en unos minutos, sube archivos, sigue el estado del proyecto
   (checklist + timeline) y chatea con el equipo.
 - **CRM** (`/admin`, solo rol OWNER): dashboard con métricas, gestión de
   clientes con filtros y etiquetas, vista de cliente en tres columnas,
   notas internas, checklist, mensajes y biblioteca de conocimiento
   (plantillas de prompts + referencias visuales).
-- **Motor de IA**: al aprobar un cliente se generan automáticamente los
-  prompts especializados (diseño, frontend, backend, Prisma, SEO, deploy,
-  testing, prompt maestro y análisis ejecutivo) a partir del brief.
+- **Motor de IA**: al aprobar un cliente se genera un único prompt maestro,
+  extenso y adaptado al objetivo, el tipo de producto y la dirección visual
+  elegida en el brief.
 
 ## Desarrollo
 

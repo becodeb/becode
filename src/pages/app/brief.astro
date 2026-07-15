@@ -18,21 +18,70 @@ const project = await prisma.project.findFirst({
 if (project && project.status !== 'PENDIENTE') return Astro.redirect('/app');
 
 const brief = project?.brief;
+const mapValue = (value: string, aliases: Record<string, string>) =>
+  aliases[value] ?? value;
+const mapValues = (value: unknown, aliases: Record<string, string>) =>
+  Array.isArray(value)
+    ? value.map((item) => mapValue(String(item), aliases))
+    : [];
+
+const industryAliases: Record<string, string> = {
+  Salud: 'Salud y bienestar',
+  Fitness: 'Deportes y entrenamiento',
+  Inmobiliaria: 'Inmobiliaria y construcción',
+  Abogados: 'Servicios legales',
+  Restaurante: 'Gastronomía',
+};
+const colorAliases: Record<string, string> = { Morado: 'Violeta' };
+const feelingAliases: Record<string, string> = {
+  Profesional: 'Autoridad',
+  Lujo: 'Exclusividad',
+  Velocidad: 'Energía',
+  Juvenil: 'Diversión',
+  Elegante: 'Autoridad',
+};
+const sectionAliases: Record<string, string> = {
+  Nosotros: 'Quiénes somos',
+  Servicios: 'Qué ofrecemos',
+  Productos: 'Productos o servicios',
+  FAQ: 'Preguntas frecuentes',
+  Blog: 'Blog o novedades',
+  Turnos: 'Turnos o reservas',
+  Dashboard: 'Panel personal',
+  Login: 'Ingreso y registro',
+  Registro: 'Ingreso y registro',
+  'Panel Admin': 'Panel de administración',
+};
 const initial = brief
   ? {
       siteType: brief.siteType,
-      industry: brief.industry,
+      industry: mapValue(brief.industry, industryAliases),
+      projectSummary: brief.projectSummary,
+      mainGoal: brief.mainGoal,
+      targetAudience: brief.targetAudience,
+      primaryAction: brief.primaryAction,
+      successMetric: brief.successMetric,
       aesthetics: brief.aesthetics as string[],
-      colors: brief.colors as string[],
-      feelings: brief.feelings as string[],
-      sections: brief.sections as string[],
+      colors: mapValues(brief.colors, colorAliases),
+      feelings: mapValues(brief.feelings, feelingAliases),
+      avoidances: brief.avoidances ?? '',
+      sections: [...new Set(mapValues(brief.sections, sectionAliases))],
       features: brief.features as string[],
+      contentStatus: brief.contentStatus,
+      hasContent: brief.contentStatus === 'Ya tenemos textos e imágenes listos',
+      contentManagement: brief.contentManagement,
+      language: brief.language,
       hasLogo: brief.hasLogo,
       hasBrand: brief.hasBrand,
       hasDomain: brief.hasDomain,
+      existingSiteUrl: brief.existingSiteUrl ?? '',
       budgetRange: brief.budgetRange,
       urgency: brief.urgency,
       referenceUrls: brief.referenceUrls as string[],
+      referenceNotes: brief.referenceNotes ?? '',
+      materialLink: brief.materialLink ?? '',
+      contactPreference: brief.contactPreference,
+      phone: brief.phone ?? '',
       comment: brief.comment ?? '',
     }
   : undefined;
@@ -48,8 +97,8 @@ const initial = brief
         {brief ? 'Ajustá tus respuestas' : 'Contanos tu proyecto'}
       </h1>
       <p class="text-muted mt-2 text-sm">
-        Son 5 pasos cortos, casi todo con un click. Al final podés subir tu logo
-        y material de referencia.
+        Son 4 etapas cortas. Preguntamos sólo lo que cambia de verdad el
+        proyecto y nosotros resolvemos el resto.
       </p>
     </header>
 

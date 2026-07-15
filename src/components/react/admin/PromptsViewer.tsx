@@ -11,7 +11,7 @@ interface PromptItem {
 
 const KIND_LABELS: Record<string, string> = {
   ANALISIS: 'Análisis',
-  COMPLETO: 'Prompt completo',
+  COMPLETO: 'Prompt maestro',
   DISENO: 'Diseño',
   FRONTEND: 'Frontend',
   BACKEND: 'Backend',
@@ -35,8 +35,8 @@ export default function PromptsViewer({ prompts }: { prompts: PromptItem[] }) {
   if (!active) {
     return (
       <p className="text-muted text-sm">
-        Todavía no hay documentación generada. Aprobá el proyecto o usá “Generar
-        documentación IA”.
+        Todavía no hay un prompt generado. Aprobá el proyecto o usá “Generar
+        prompt maestro”.
       </p>
     );
   }
@@ -74,7 +74,7 @@ export default function PromptsViewer({ prompts }: { prompts: PromptItem[] }) {
       <div
         className="flex flex-wrap gap-1.5"
         role="tablist"
-        aria-label="Documentos generados"
+        aria-label="Prompts generados"
       >
         {sorted.map((prompt) => (
           <button

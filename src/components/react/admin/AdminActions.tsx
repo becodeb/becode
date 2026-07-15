@@ -106,8 +106,8 @@ export default function AdminActions({
           className="bg-signal text-surface hover:bg-signal-dark w-full rounded-[var(--radius-ui)] px-4 py-3 text-sm font-bold transition-colors disabled:opacity-60"
         >
           {busy === 'approve'
-            ? 'Aprobando y generando documentación…'
-            : 'Aprobar y generar documentación'}
+            ? 'Aprobando y generando el prompt…'
+            : 'Aprobar y generar prompt maestro'}
         </button>
       ) : (
         <button
@@ -119,13 +119,13 @@ export default function AdminActions({
           {busy === 'generate'
             ? 'Regenerando con IA…'
             : hasPrompts
-              ? 'Regenerar documentación IA'
-              : 'Generar documentación IA'}
+              ? 'Regenerar prompt maestro'
+              : 'Generar prompt maestro'}
         </button>
       )}
       {(busy === 'approve' || busy === 'generate') && (
         <p className="text-muted text-xs">
-          La IA está redactando los prompts del proyecto; puede tardar un
+          La IA está redactando un prompt completo y específico; puede tardar un
           minuto. No cierres esta pestaña.
         </p>
       )}

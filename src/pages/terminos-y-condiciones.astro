@@ -1,0 +1,224 @@
+---
+export const prerender = true;
+
+import Footer from '@/components/astro/Footer.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Términos y condiciones | becode"
+  description="Condiciones de uso, contratación, privacidad y propiedad intelectual de becode."
+>
+  <header
+    class="border-line bg-paper/95 sticky top-0 z-50 border-b backdrop-blur"
+  >
+    <div class="shell flex h-16 items-center justify-between">
+      <a
+        href="/"
+        class="font-display text-2xl font-bold"
+        aria-label="Volver a becode"
+      >
+        be<span class="text-signal">/</span>code
+      </a>
+      <a
+        href="/"
+        class="border-line hover:border-ink rounded-[var(--radius-ui)] border px-4 py-2 text-sm font-semibold transition-colors"
+      >
+        Volver al sitio
+      </a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="border-line border-b py-16 sm:py-24">
+      <div class="shell">
+        <p class="eyebrow text-signal">Información legal</p>
+        <h1
+          class="font-display mt-5 max-w-4xl text-5xl leading-[0.95] font-bold sm:text-7xl"
+        >
+          Términos y condiciones
+        </h1>
+        <p class="text-muted mt-7 max-w-2xl text-lg leading-8">
+          Queremos que cada relación de trabajo empiece con información clara.
+          Estas condiciones explican cómo funciona el sitio y el marco general
+          de los servicios de becode.
+        </p>
+        <p class="text-dim mt-8 font-mono text-xs uppercase">
+          Última actualización: 15 de julio de 2026
+        </p>
+      </div>
+    </section>
+
+    <div
+      class="shell grid gap-12 py-16 lg:grid-cols-[15rem_1fr] lg:gap-20 lg:py-24"
+    >
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <p class="font-display text-lg font-bold">En pocas palabras</p>
+        <p class="text-muted mt-3 text-sm leading-6">
+          Cada proyecto tiene su propuesta y acuerdo particular. Este documento
+          establece las reglas generales del sitio y la relación con becode.
+        </p>
+        <a
+          href="mailto:hola@becode.com.ar"
+          class="text-signal mt-5 inline-block text-sm font-semibold underline underline-offset-4"
+        >
+          hola@becode.com.ar
+        </a>
+      </aside>
+
+      <article class="legal-copy max-w-3xl">
+        <section>
+          <h2>1. Identificación y alcance</h2>
+          <p>
+            Este sitio pertenece a becode, estudio argentino de desarrollo de
+            software. Las consultas pueden enviarse a
+            <a href="mailto:hola@becode.com.ar">hola@becode.com.ar</a>. El uso
+            del sitio implica conocer estas condiciones, sin reemplazar los
+            acuerdos específicos que se firmen para cada proyecto.
+          </p>
+        </section>
+
+        <section>
+          <h2>2. Información y contratación</h2>
+          <p>
+            El contenido del sitio es informativo. Una contratación comienza
+            cuando ambas partes aprueban una propuesta, presupuesto o contrato
+            que define alcance, entregables, plazos, precio y forma de pago. La
+            documentación comercial y la facturación se emiten de acuerdo con
+            las condiciones y obligaciones aplicables a cada operación.
+          </p>
+        </section>
+
+        <section>
+          <h2>3. Cambios y responsabilidades</h2>
+          <p>
+            Los cambios que excedan el alcance acordado pueden requerir una
+            nueva estimación. Cada parte debe entregar en tiempo razonable la
+            información, accesos y aprobaciones necesarios para avanzar. Las
+            garantías, soporte y mantenimiento se detallan en la propuesta de
+            cada proyecto.
+          </p>
+        </section>
+
+        <section>
+          <h2>4. Propiedad intelectual</h2>
+          <p>
+            Los derechos sobre diseños, código, contenidos, licencias y
+            materiales se establecen por escrito en cada contratación. El
+            cliente declara contar con autorización para usar los textos,
+            marcas, imágenes y archivos que proporciona. Los programas de
+            computación y demás obras están contemplados por la
+            <a
+              href="https://www.argentina.gob.ar/normativa/nacional/42755/actualizacion"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ley 11.723 de Propiedad Intelectual
+            </a>.
+          </p>
+        </section>
+
+        <section>
+          <h2>5. Datos personales y privacidad</h2>
+          <p>
+            Los datos enviados mediante formularios, el portal o los canales de
+            contacto se utilizan para responder consultas, preparar propuestas y
+            gestionar proyectos. No vendemos datos personales. Podemos utilizar
+            proveedores técnicos necesarios para operar el servicio, bajo
+            medidas razonables de seguridad y acceso limitado.
+          </p>
+          <p>
+            La persona titular puede solicitar acceso, corrección o eliminación
+            escribiendo a <a href="mailto:hola@becode.com.ar"
+              >hola@becode.com.ar</a
+            >. El tratamiento se encuadra en la
+            <a
+              href="https://www.argentina.gob.ar/normativa/nacional/ley-25326-64790/texto"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ley 25.326 de Protección de los Datos Personales
+            </a>
+            y su reglamentación aplicable.
+          </p>
+        </section>
+
+        <section>
+          <h2>6. Confidencialidad y seguridad</h2>
+          <p>
+            La información confidencial recibida para evaluar o ejecutar un
+            proyecto se utiliza exclusivamente con ese fin. Aplicamos medidas
+            técnicas y organizativas razonables, aunque ningún sistema conectado
+            a internet puede garantizar riesgo cero.
+          </p>
+        </section>
+
+        <section>
+          <h2>7. Servicios de terceros</h2>
+          <p>
+            Algunos proyectos o funciones del sitio pueden depender de servicios
+            externos, como alojamiento, correo, analítica, pagos o APIs. Sus
+            condiciones y disponibilidad también pueden resultar aplicables y se
+            informan cuando son relevantes para el proyecto.
+          </p>
+        </section>
+
+        <section>
+          <h2>8. Personas consumidoras</h2>
+          <p>
+            Cuando corresponda una relación de consumo, estas condiciones se
+            interpretan sin limitar los derechos reconocidos por la
+            <a
+              href="https://www.argentina.gob.ar/normativa/nacional/ley-24240-638/actualizacion"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ley 24.240 de Defensa del Consumidor
+            </a>
+            y demás normas aplicables.
+          </p>
+        </section>
+
+        <section>
+          <h2>9. Ley aplicable y actualizaciones</h2>
+          <p>
+            Se aplica la legislación de la República Argentina. Cualquier
+            diferencia se intentará resolver primero de buena fe y por una vía
+            directa. Podemos actualizar estas condiciones para reflejar cambios
+            operativos o normativos; la fecha vigente siempre se publica al
+            comienzo del documento.
+          </p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal-copy section + section {
+    margin-top: 3.5rem;
+    padding-top: 3.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .legal-copy h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+  }
+
+  .legal-copy p {
+    margin-top: 1rem;
+    color: var(--color-muted);
+    line-height: 1.8;
+  }
+
+  .legal-copy a {
+    color: var(--color-signal);
+    font-weight: 650;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>

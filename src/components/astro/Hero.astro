@@ -79,9 +79,9 @@ const showcaseProjects = projects.flatMap(({ id, data }) =>
   .showcase-slot {
     position: absolute;
     z-index: 1;
+    top: 0;
     right: 0;
-    bottom: 1.5rem;
-    width: 91%;
+    width: 100%;
     opacity: 0;
     transform: translateY(1.5rem) scale(0.97);
     animation: product-in 600ms 520ms forwards cubic-bezier(0.23, 1, 0.32, 1);
@@ -105,7 +105,7 @@ const showcaseProjects = projects.flatMap(({ id, data }) =>
       min-height: 34rem;
     }
     .showcase-slot {
-      width: 92%;
+      width: 100%;
     }
   }
 
@@ -114,7 +114,7 @@ const showcaseProjects = projects.flatMap(({ id, data }) =>
       min-height: 20rem;
     }
     .showcase-slot {
-      bottom: 1rem;
+      top: 0;
       width: 100%;
     }
   }

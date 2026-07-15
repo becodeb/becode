@@ -1,0 +1,114 @@
+---
+import FileUploader from '@/components/react/portal/FileUploader';
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import { getClientProject } from '@/lib/server/projects/queries';
+
+export const prerender = false;
+
+const user = Astro.locals.user!;
+if (user.role === 'OWNER') return Astro.redirect('/admin');
+
+const project = await getClientProject(user);
+if (!project) return Astro.redirect('/app/brief');
+
+const fileItems = project.files.map((file) => ({
+  id: file.id,
+  filename: file.filename,
+  size: file.size,
+  canDelete: project.status === 'PENDIENTE',
+}));
+
+const isWelcome = Astro.url.searchParams.get('bienvenida') === '1';
+---
+
+<PortalLayout title="Archivos del proyecto">
+  <div class="portal-enter mx-auto max-w-4xl space-y-6">
+    <header>
+      <p class="text-signal font-mono text-xs tracking-widest uppercase">
+        Material del proyecto
+      </p>
+      <h1 class="font-display mt-2 text-3xl font-bold tracking-tight">
+        Todo lo útil, en un solo lugar
+      </h1>
+      <p class="text-muted mt-2 max-w-2xl text-sm leading-6">
+        Subí lo que ya exista. No hace falta ordenar ni renombrar perfecto: el
+        equipo revisa el material y te avisa si falta algo.
+      </p>
+    </header>
+
+    {
+      isWelcome && (
+        <div class="border-signal/30 bg-signal/5 rounded-[var(--radius-ui)] border p-4">
+          <p class="font-semibold">Brief recibido. Este es el último paso.</p>
+          <p class="text-muted mt-1 text-sm">
+            Cuando termines de subir lo que tengas, podés volver al resumen.
+          </p>
+        </div>
+      )
+    }
+
+    <div class="grid gap-6 md:grid-cols-[0.75fr_1.25fr]">
+      <aside class="border-line border-t pt-5">
+        <h2 class="font-display text-lg font-bold">Qué sirve compartir</h2>
+        <ul class="text-muted mt-4 space-y-3 text-sm leading-5">
+          <li>
+            <strong class="text-ink">Logo:</strong> PNG, SVG o el archivo original.
+          </li>
+          <li>
+            <strong class="text-ink">Identidad:</strong> colores, tipografías o manual
+            de marca.
+          </li>
+          <li>
+            <strong class="text-ink">Contenido:</strong> textos, fotos, videos, catálogos
+            o listas de precios.
+          </li>
+          <li>
+            <strong class="text-ink">Información:</strong> documentos, planillas o
+            material del sitio anterior.
+          </li>
+        </ul>
+        <p class="text-dim mt-5 text-xs leading-5">
+          Se aceptan imágenes, videos, PDF, Word, Excel, texto y ZIP. Máximo 25
+          MB por archivo.
+        </p>
+        {
+          project.brief?.materialLink && (
+            <a
+              href={project.brief.materialLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="border-line hover:border-ink mt-5 block rounded-[var(--radius-ui)] border px-3 py-2.5 text-sm font-semibold transition-colors"
+            >
+              Abrir la carpeta compartida ↗
+            </a>
+          )
+        }
+      </aside>
+
+      <section class="portal-card p-6" aria-label="Subir archivos">
+        <div class="mb-5 flex items-end justify-between gap-3">
+          <div>
+            <p class="text-muted text-xs font-semibold uppercase">Archivos</p>
+            <h2 class="font-display mt-1 text-xl font-bold">
+              {
+                fileItems.length === 0
+                  ? 'Todavía no subiste material'
+                  : `${fileItems.length} ${fileItems.length === 1 ? 'archivo subido' : 'archivos subidos'}`
+              }
+            </h2>
+          </div>
+        </div>
+        <FileUploader client:visible files={fileItems} canUpload={true} />
+      </section>
+    </div>
+
+    <div class="flex justify-end">
+      <a
+        href="/app"
+        class="bg-ink text-surface hover:bg-signal rounded-[var(--radius-ui)] px-5 py-2.5 text-sm font-bold transition-colors"
+      >
+        Ir al resumen →
+      </a>
+    </div>
+  </div>
+</PortalLayout>

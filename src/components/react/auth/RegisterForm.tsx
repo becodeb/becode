@@ -106,7 +106,16 @@ export default function RegisterForm() {
           className="accent-signal mt-0.5 h-4 w-4"
         />
         <span className="text-muted">
-          Acepto que becode use estos datos para gestionar mi proyecto.
+          Acepto los{' '}
+          <a
+            href="/terminos-y-condiciones"
+            target="_blank"
+            rel="noreferrer"
+            className="text-ink hover:text-signal font-semibold underline underline-offset-2"
+          >
+            términos y el tratamiento de mis datos
+          </a>{' '}
+          para gestionar el proyecto.
         </span>
       </label>
       <FormError message={error} />

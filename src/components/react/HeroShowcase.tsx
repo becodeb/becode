@@ -340,8 +340,17 @@ function ShowcaseCard({
     >
       <motion.div className="flex h-full w-full flex-col" style={{ x, y }}>
         <div className="border-line flex h-11 shrink-0 items-center gap-3 border-b px-4 text-xs font-bold">
-          <span className="bg-ink text-surface grid h-7 w-7 place-items-center rounded-[0.2rem]">
-            b<span className="text-signal">/</span>
+          <span
+            className="grid h-8 w-8 shrink-0 place-items-center"
+            aria-hidden="true"
+          >
+            <img
+              src="/brand-mark.webp"
+              alt=""
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain mix-blend-multiply"
+            />
           </span>
           <span className="truncate">{project.name}</span>
           <span className="text-muted ml-auto shrink-0 font-mono text-[0.62rem] uppercase">

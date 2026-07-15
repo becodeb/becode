@@ -44,53 +44,6 @@ body {
   font-family: var(--font-body);
 }
 
-.boot-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background: var(--color-ink);
-  color: var(--color-surface);
-  pointer-events: none;
-  animation: boot-exit 340ms 420ms forwards cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-.boot-console {
-  display: grid;
-  width: min(100% - 2rem, 31rem);
-  grid-template-columns: 1fr auto;
-  gap: 0.55rem 1rem;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  padding: 1.25rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-}
-
-.boot-console span {
-  grid-column: 1 / -1;
-  color: var(--color-dim);
-}
-
-.boot-console code {
-  color: var(--color-surface);
-}
-
-.boot-console strong {
-  color: var(--color-signal);
-}
-
-.boot-screen > i {
-  position: absolute;
-  inset: auto 0 0;
-  height: 0.25rem;
-  background: var(--color-signal);
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: boot-progress 520ms 40ms forwards cubic-bezier(0.23, 1, 0.32, 1);
-}
-
 .scroll-progress {
   position: fixed;
   z-index: 60;
@@ -214,22 +167,8 @@ textarea {
     transform: none;
   }
 
-  .boot-screen,
   .scroll-progress {
     display: none;
-  }
-}
-
-@keyframes boot-progress {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes boot-exit {
-  to {
-    visibility: hidden;
-    clip-path: inset(0 0 100% 0);
   }
 }
 

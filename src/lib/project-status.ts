@@ -33,17 +33,17 @@ export const STATUS_META: Record<
     badge: 'bg-violet-500/10 text-violet-700 border-violet-500/30',
   },
   DESARROLLO: {
-    label: 'Desarrollo',
+    label: 'Construcción',
     dot: 'bg-blue-500',
     badge: 'bg-blue-500/10 text-blue-700 border-blue-500/30',
   },
   TESTING: {
-    label: 'Testing',
+    label: 'Revisión',
     dot: 'bg-cyan-500',
     badge: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/30',
   },
   DEPLOY: {
-    label: 'Deploy',
+    label: 'Publicación',
     dot: 'bg-orange-500',
     badge: 'bg-orange-500/10 text-orange-700 border-orange-500/30',
   },

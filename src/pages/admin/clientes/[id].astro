@@ -9,7 +9,7 @@ import TagPicker from '@/components/react/admin/TagPicker';
 import FileUploader from '@/components/react/portal/FileUploader';
 import MessagesThread from '@/components/react/portal/MessagesThread';
 import PortalLayout from '@/layouts/PortalLayout.astro';
-import { urgencyLabel } from '@/lib/brief-options';
+import { featureLabel, urgencyLabel } from '@/lib/brief-options';
 import { formatDate, formatDateTime } from '@/lib/project-status';
 import { prisma } from '@/lib/server/db';
 
@@ -47,14 +47,29 @@ const briefRows = brief
   ? [
       ['Tipo de sitio', brief.siteType],
       ['Rubro', brief.industry],
+      ['Qué necesitan', brief.projectSummary || '—'],
+      ['Objetivo principal', brief.mainGoal || '—'],
+      ['Público', brief.targetAudience || '—'],
+      ['Acción principal', brief.primaryAction || '—'],
+      ['Cómo miden el éxito', brief.successMetric || '—'],
       ['Estética', (brief.aesthetics as string[]).join(', ') || '—'],
       ['Colores', (brief.colors as string[]).join(', ') || '—'],
       ['Sensaciones', (brief.feelings as string[]).join(', ') || '—'],
+      ['Quieren evitar', brief.avoidances || '—'],
       ['Secciones', (brief.sections as string[]).join(', ') || '—'],
-      ['Funcionalidades', (brief.features as string[]).join(', ') || '—'],
+      [
+        'Funcionalidades',
+        (brief.features as string[]).map(featureLabel).join(', ') || '—',
+      ],
+      ['Contenido disponible', brief.contentStatus || '—'],
+      ['Actualización del contenido', brief.contentManagement || '—'],
+      ['Idioma', brief.language || '—'],
       ['Logo', brief.hasLogo ? 'Tiene' : 'No tiene'],
       ['Identidad visual', brief.hasBrand ? 'Tiene' : 'No tiene'],
       ['Dominio', brief.hasDomain ? 'Tiene' : 'No tiene'],
+      ['Sitio actual', brief.existingSiteUrl || '—'],
+      ['Contacto preferido', brief.contactPreference],
+      ['Teléfono', brief.phone || '—'],
       ['Presupuesto', `${brief.budgetRange} USD`],
       ['Urgencia', urgencyLabel(brief.urgency)],
     ]
@@ -214,6 +229,25 @@ const promptItems = project.prompts.map((prompt) => ({
                     </ul>
                   </div>
                 )}
+                {brief.referenceNotes && (
+                  <p class="text-muted mt-3 text-sm">
+                    <strong class="text-ink">Qué les gusta:</strong>{' '}
+                    {brief.referenceNotes}
+                  </p>
+                )}
+                {brief.materialLink && (
+                  <p class="text-muted mt-3 text-sm">
+                    <strong class="text-ink">Carpeta de material:</strong>{' '}
+                    <a
+                      href={brief.materialLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-signal break-all hover:underline"
+                    >
+                      {brief.materialLink}
+                    </a>
+                  </p>
+                )}
                 {brief.comment && (
                   <blockquote class="border-signal/40 text-muted mt-4 border-l-2 pl-3 text-sm italic">
                     “{brief.comment}”
@@ -224,10 +258,8 @@ const promptItems = project.prompts.map((prompt) => ({
           }
         </section>
 
-        <section class="portal-card p-6" aria-label="Documentación IA">
-          <h2 class="font-display mb-4 text-base font-bold">
-            Documentación IA
-          </h2>
+        <section class="portal-card p-6" aria-label="Prompt maestro">
+          <h2 class="font-display mb-4 text-base font-bold">Prompt maestro</h2>
           <PromptsViewer client:visible prompts={promptItems} />
         </section>
 
