@@ -1,0 +1,10 @@
+{
+  "nombre": "Typely",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-05-26",
+  "url": "https://typely.becode.com.ar",
+  "nivel": "Primaria",
+  "resumen": "Mecanografía jugando, pensada para Chromebooks con pantalla táctil.",
+  "captura": "../../assets/capturas/typely.webp"
+}

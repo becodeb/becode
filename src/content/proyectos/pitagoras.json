@@ -1,0 +1,10 @@
+{
+  "nombre": "Pitágoras con agua",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-09-20",
+  "url": "https://pitagoras.becode.com.ar",
+  "nivel": "Secundaria",
+  "resumen": "El teorema de Pitágoras con cuadrados que se llenan de agua, para proyectar en clase.",
+  "captura": "../../assets/capturas/pitagoras.webp"
+}

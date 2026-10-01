@@ -1,0 +1,16 @@
+{
+  "nombre": "Loop",
+  "tipo": "herramienta",
+  "estado": "en-uso",
+  "fecha": "2026-08-18",
+  "url": "https://loop.reditinere.com",
+  "color": "#229a88",
+  "orden": 4,
+  "formato": "movil",
+  "titular": "Útiles que pasan de una familia a otra",
+  "detalle": "Las familias publican lo que ya no usan y lo cambian por loopies, no por plata. Tiene una demo sin cuenta.",
+  "dato": "Hecha para la red Itinere.",
+  "resumen": "Intercambio de útiles escolares entre familias de la red Itinere.",
+  "captura": "../../assets/capturas/loop.webp",
+  "capturaMovil": "../../assets/capturas/loop-movil.webp"
+}

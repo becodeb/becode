@@ -1,0 +1,10 @@
+{
+  "nombre": "STEAMLAB",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-08-12",
+  "url": "https://aigames.becode.com.ar",
+  "nivel": "Taller",
+  "resumen": "Los chicos escriben bien el pedido y la IA arma el videojuego.",
+  "captura": "../../assets/capturas/steamlab.webp"
+}

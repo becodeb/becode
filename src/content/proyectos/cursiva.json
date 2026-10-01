@@ -1,0 +1,10 @@
+{
+  "nombre": "Cursiva",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-08-24",
+  "url": "https://cursiva.becode.com.ar",
+  "nivel": "Primaria",
+  "resumen": "Un zoológico para recorrer con el Pulpito, con un desafío de lectura y escritura en cada animal.",
+  "captura": "../../assets/capturas/cursiva.webp"
+}

@@ -1,0 +1,10 @@
+{
+  "nombre": "Juegos de Scratch",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-09-22",
+  "url": "https://juegosscratch.becode.com.ar",
+  "nivel": "4.º grado",
+  "resumen": "Un tablero donde cada chico sube su juego de Scratch y prueba los de sus compañeros.",
+  "captura": "../../assets/capturas/juegos-scratch.webp"
+}

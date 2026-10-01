@@ -1,0 +1,10 @@
+{
+  "nombre": "Camino",
+  "tipo": "recurso",
+  "estado": "piloto",
+  "fecha": "2026-09-27",
+  "url": "https://camino.becode.com.ar",
+  "nivel": "Sala de 4 a 3.er grado",
+  "resumen": "Programación sin pantallas de código: dos hojas por grado, de sala de 4 a 3.er grado.",
+  "captura": "../../assets/capturas/camino.webp"
+}

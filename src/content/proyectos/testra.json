@@ -1,0 +1,16 @@
+{
+  "nombre": "Testra",
+  "tipo": "herramienta",
+  "estado": "en-uso",
+  "fecha": "2026-08-21",
+  "url": "https://testra.becode.com.ar",
+  "color": "#0a2878",
+  "orden": 2,
+  "titular": "Evaluaciones que no deciden por vos",
+  "detalle": "Opción múltiple, desarrollo e imágenes. Los alumnos entran con un código. Testra registra los cambios de pestaña y el copiar y pegar; la nota la pone el docente.",
+  "dato": "Docentes del Northfield ya toman exámenes con Testra. Hoy es gratis.",
+  "resumen": "Exámenes digitales con un registro transparente de lo que pasa en pantalla.",
+  "acciones": [{ "etiqueta": "Probar la demo", "url": "https://testra.becode.com.ar/demo" }],
+  "captura": "../../assets/capturas/testra.webp",
+  "capturaMovil": "../../assets/capturas/testra-movil.webp"
+}

@@ -1,0 +1,10 @@
+{
+  "nombre": "Misión Robot",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-09-25",
+  "url": "https://pensamientocomputacional.becode.com.ar",
+  "nivel": "6.º grado",
+  "resumen": "Desafíos para medir el pensamiento computacional de un curso.",
+  "captura": "../../assets/capturas/mision-robot.webp"
+}

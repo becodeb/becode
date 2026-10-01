@@ -1,0 +1,10 @@
+{
+  "nombre": "Balanza de fracciones",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-09-20",
+  "url": "https://fracciones.becode.com.ar",
+  "nivel": "Primaria",
+  "resumen": "Fracciones que pesan lo que valen: se comparan en una balanza.",
+  "captura": "../../assets/capturas/balanza-fracciones.webp"
+}

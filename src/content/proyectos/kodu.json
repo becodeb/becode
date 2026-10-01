@@ -1,0 +1,16 @@
+{
+  "nombre": "Kodu",
+  "tipo": "herramienta",
+  "estado": "en-uso",
+  "fecha": "2026-08-21",
+  "url": "https://kodu.becode.com.ar",
+  "color": "#3b2ce7",
+  "orden": 1,
+  "titular": "Recursos interactivos pedidos en una frase",
+  "detalle": "El docente describe la actividad y Kodu la devuelve funcionando: una simulación, un juego, un gráfico. Los alumnos la abren con un link, sin cuenta.",
+  "dato": "Unos 20 docentes en el primer taller y 21 recursos publicados en la galería al 30 de septiembre de 2026.",
+  "resumen": "Crear recursos interactivos conversando con IA.",
+  "acciones": [{ "etiqueta": "Ver la galería", "url": "https://kodu.becode.com.ar/gallery" }],
+  "captura": "../../assets/capturas/kodu.webp",
+  "capturaMovil": "../../assets/capturas/kodu-movil.webp"
+}

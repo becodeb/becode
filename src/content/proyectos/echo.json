@@ -1,0 +1,15 @@
+{
+  "nombre": "Echo",
+  "tipo": "herramienta",
+  "estado": "piloto",
+  "fecha": "2026-08-27",
+  "url": "https://echo.becode.com.ar",
+  "color": "#4f46e5",
+  "orden": 3,
+  "titular": "El acta de la reunión, sin que nadie deje de escuchar",
+  "detalle": "Escucha la reunión, la transcribe y redacta el acta con acuerdos y compromisos. El audio nunca se guarda.",
+  "dato": "Es la más nueva: buscamos escuelas que quieran probarla.",
+  "resumen": "Actas de reuniones institucionales, sin guardar el audio.",
+  "captura": "../../assets/capturas/echo.webp",
+  "capturaMovil": "../../assets/capturas/echo-movil.webp"
+}

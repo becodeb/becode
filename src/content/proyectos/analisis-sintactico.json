@@ -1,0 +1,10 @@
+{
+  "nombre": "Análisis sintáctico",
+  "tipo": "recurso",
+  "estado": "experimento",
+  "fecha": "2026-09-20",
+  "url": "https://evaluacionsintaxis.becode.com.ar",
+  "nivel": "Prácticas del Lenguaje",
+  "resumen": "Ejercicios de sintaxis que se corrigen solos.",
+  "captura": "../../assets/capturas/analisis-sintactico.webp"
+}

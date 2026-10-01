@@ -3,14 +3,21 @@
 import { getCollection } from 'astro:content';
 import companyContext from '@/data/company-context.md?raw';
 
+const ESTADO_LABEL: Record<string, string> = {
+  'en-uso': 'En uso',
+  piloto: 'Piloto',
+  experimento: 'Experimento',
+};
+
 export async function buildSiteAssistantPrompt(): Promise<string> {
-  const projects = (await getCollection('projects')).sort(
-    (a, b) => a.data.order - b.data.order,
+  const projects = (await getCollection('proyectos')).sort(
+    (a, b) => a.data.fecha.getTime() - b.data.fecha.getTime(),
   );
 
   const projectLines = projects.map((project) => {
-    const { name, description, stack, category, status, url } = project.data;
-    return `- ${name} (${category}, ${status}) — ${description} · Stack: ${stack.join(', ')} · ${url}`;
+    const { nombre, resumen, tipo, estado, url } = project.data;
+    const estadoLabel = ESTADO_LABEL[estado] ?? estado;
+    return `- ${nombre} (${tipo}, ${estadoLabel}) — ${resumen} · ${url}`;
   });
 
   return [
