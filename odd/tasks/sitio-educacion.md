@@ -139,6 +139,17 @@ RDD: off globally since 2026-09-23 (user decision) → no review ceremony; ordin
 - Echo estado set to "piloto" provisionally (no real use yet); statuses of resources default to
   "experimento" pending confirmation; dates = first git commit of each repo.
 
+- 2026-10-01: direct user feedback (viewing on phone) drove a third pass, commit b365e39: restored
+  the old hero carousel (HeroShowcase.tsx + Hero.astro from master, fed from `proyectos`), dropped
+  the margin-column/red-line layout for a normal centered container, collapsed the bitácora into
+  #recursos (3 recent cards + closed-by-default "ver todo" details), removed dark mode entirely
+  (no prefers-color-scheme override), softened light contrast (ink #24211d, body #3d3934, muted
+  #6f6a62, all >= 4.5:1 on paper), and shrank the hero H1/copy. Verified: check 0 errors, lint
+  clean, full build OK; 1440/390 no overflow (scrollWidth == clientWidth == 390); carousel front
+  card changed over 5s with motion enabled (Kodu -> Testra); details closed by default, opens on
+  summary click (15 rows = full proyectos count); colorScheme: 'dark' now renders pixel-identical
+  to light.
+
 ## Next step
 
 Direction checkpoint sent to the user (with question about doubtful apps: analitica, smartcampus,
