@@ -64,11 +64,52 @@ RDD: off globally since 2026-09-23 (user decision) → no review ceremony; ordin
 
 ## Tasks
 
-- [ ] T1 Content model: new `proyectos` collection (schema, entries, optimized screenshots); old
+- [x] T1 Content model: new `proyectos` collection (schema, entries, optimized screenshots); old
       portfolio entries and screenshots removed. Route: delegated (writer, 2+ files).
-- [ ] T2 Public layout and tokens: `site.css`, `BaseLayout` without chatbot, header and footer.
-      Route: delegated (same writer).
-- [ ] T3 Home sections: hero, team, tools, resources, bitácora, join/contact. Route: delegated.
+      Commit: 1472a60 feat(content): replace projects collection with education proyectos.
+- [x] T2 Public layout and tokens: `site.css`, `BaseLayout` without chatbot, header and footer.
+      Route: delegated (same writer). Committed together with T3 (inseparable).
+- [x] T3 Home sections: hero, team, tools, resources, bitácora, join/contact. Route: delegated.
+      Commit: 1d5544c feat(site): redesign public site as education brand.
+      Checks: `npm run check` (48 pre-existing baseline errors in app/brief.astro and
+      app/mensajes.astro from Prisma schema drift, unrelated to this change, confirmed
+      identical on master before this branch; zero new errors), `npm run lint` (clean),
+      `npx astro build` (completes; the gated `npm run build` script only fails because
+      its `astro check &&` prefix hits the same pre-existing baseline). Browser-checked at
+      390x844 and 1440x900, light and dark, full page: fixed two bugs found this way (dark
+      mode not applying because `@theme` cannot be nested in `@media` in Tailwind v4 — fixed
+      by overriding plain `--color-*` custom properties instead; the "el margen" red line
+      was drawing as separate short bars per section instead of one continuous line — fixed
+      by making `<main>` the single grid and `display:contents` sections). `/login`,
+      `/registro`, `/recuperar`, `/terminos-y-condiciones`, `/` all return 200 on the dev
+      server.
+- [x] Desktop review fixes (coordinator pass): stale local Prisma client was the actual
+      cause of the 48 `astro check` errors, not a baseline — ran `npx prisma generate`,
+      `npm run check` now gives 0 errors and `npm run build` (dummy env) passes fully.
+      Fixed: (1) the red "el margen" line only spanned the hero row because
+      `grid-row: 1 / -1` resolves against the explicit grid (which had 0 explicit rows),
+      not the implicit one — measured via `getBoundingClientRect` (line was 647px of
+      main's 6115px); switched the line to an absolutely-positioned child of `<main>`
+      instead of a grid-row span; re-measured after the fix: line top/bottom now exactly
+      match `<main>`'s own top/bottom (both 88.28 to 6811.6px). (2) `display: contents` on
+      each section voided its own Tailwind padding, so desktop sections touched — moved to
+      `row-gap: 8rem` on the shared grid (mobile keeps its own `padding-block: 2.5rem` per
+      section, i.e. ~5rem between). (3) hero's margin date now sits beside the "Lo último"
+      row via a `.margen-nota` (position:absolute, offset back into the margin column from
+      a `position:relative` wrapper) instead of the section-level mark; same technique
+      drives each bitácora entry's date. Hero mobile thumbnail now 112×70 `object-top`.
+      (4) bitácora rebuilt: grouped by month (heading in content column, year not repeated
+      per entry), ruled background removed, thumbnail in a fixed-width flex cell so rows no
+      longer zigzag. (5) Loop's herramientas image now `aspect-[4/5] object-top` like the
+      others, closing the row-1 height gap. (6) Kodu's `capturaMovil` replaced with the new
+      gallery mobile capture. (7) confirmed via Playwright (`img.complete && naturalWidth >
+      0` over every `document.images`) that all 20 images on `/` loaded after a stepped
+      scroll-to-bottom before the full-page capture, in all 4 combinations (1440/390 ×
+      light/dark) — 20/20 ok each time; the earlier blank captures were a screenshot-timing
+      artifact (native lazy-loading needs scroll proximity), not a real asset failure.
+      (8) Camino's resumen copy updated to the unverified-claim-free wording.
+      Checks re-run: `npm run check` (0 errors), `npm run lint` (clean), `npm run build`
+      with dummy env (completes). Routes still 200. Commit: see git log.
 - [ ] CHECKPOINT: show visual direction (2–3 lines + home screenshot) and ask about doubtful apps.
 - [ ] T4 Remaining pages: full bitácora view if needed, terms page on the new layout, OG image, meta.
 - [ ] T5 Cleanup: delete unused public components/assets; keep portal-shared pieces.

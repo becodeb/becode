@@ -108,12 +108,19 @@ summary {
 }
 
 /*
- * El margen: the notebook's red margin line, as ONE continuous page grid for
- * the whole <main>. Each <section class="el-margen__section"> becomes
- * `display: contents` on desktop so its margin-mark and content land as grid
- * items in the shared columns (one row per section); on mobile the grid
- * collapses and the section renders as a normal block with the margin
- * texts inline above their content.
+ * El margen: the notebook's red margin line. On desktop <main> is a 3-column
+ * grid (margin mark | rule | content); the continuous red line is an
+ * absolutely-positioned child of <main> (not a grid row-span: `grid-row: 1 /
+ * -1` resolves against the EXPLICIT grid, which has no rows here, so it only
+ * ever spanned the first auto row — measured and confirmed, see commit
+ * notes). Sections keep one grid row each (mark + content), spaced out with
+ * `row-gap`. Fine-grained margin notes that must align to a specific line
+ * inside a content cell (the hero's "Lo último" row, each bitácora entry's
+ * date) use `.margen-nota`: an absolutely-positioned child of a
+ * `position: relative` wrapper inside that content cell, offset back into
+ * the margin column — this sidesteps subgrid entirely.
+ * On mobile the grid collapses; each `.el-margen__section` instead renders
+ * as a block with its own red bar via ::before.
  */
 main.el-margen {
   display: block;
@@ -124,10 +131,13 @@ main.el-margen {
 
 @media (min-width: 768px) {
   main.el-margen {
+    position: relative;
     display: grid;
     grid-template-columns: 9rem 2px minmax(0, 68rem);
     column-gap: 2rem;
+    row-gap: 8rem;
     padding-inline: 2rem;
+    padding-block: 4rem;
   }
 }
 
@@ -141,8 +151,14 @@ main.el-margen {
 @media (min-width: 768px) {
   .el-margen__rule {
     display: block;
-    grid-column: 2;
-    grid-row: 1 / -1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    /* Containing block is main's padding box: back out past content's
+       padding-inline (2rem) + gap (2rem) + the 2px rule track + gap (2rem)
+       to land the line exactly between the margin and content columns. */
+    left: calc(2rem + 9rem + 2rem);
+    width: 2px;
   }
 }
 
@@ -188,6 +204,7 @@ html.motion-ready .el-margen__rule {
     display: block;
     padding-left: 30px;
     padding-right: 16px;
+    padding-block: 2.5rem;
   }
 
   .el-margen__section::before {
@@ -198,5 +215,15 @@ html.motion-ready .el-margen__rule {
     left: 14px;
     width: 3px;
     background: var(--color-red);
+  }
+}
+
+/* A margin note tied to one specific line inside a content cell (see above). */
+@media (min-width: 768px) {
+  .margen-nota {
+    position: absolute;
+    top: 0;
+    left: calc(-9rem - 2rem - 2px - 2rem);
+    width: 9rem;
   }
 }

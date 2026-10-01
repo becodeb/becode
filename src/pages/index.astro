@@ -65,6 +65,25 @@ const formatoFecha = (fecha: Date) =>
 const formatoFechaLarga = (fecha: Date) =>
   `${fecha.getDate()} de ${MESES_LARGOS[fecha.getMonth()]}`;
 const formatoAnio = (fecha: Date) => fecha.getFullYear();
+
+// Bitácora is grouped by month so the margin date doesn't need to repeat
+// the year on every entry; `bitacora` stays sorted desc, so groups come out
+// desc too.
+const gruposBitacora: { clave: string; etiqueta: string; items: typeof bitacora }[] = [];
+for (const item of bitacora) {
+  const clave = `${item.data.fecha.getFullYear()}-${item.data.fecha.getMonth()}`;
+  let grupo = gruposBitacora.find((g) => g.clave === clave);
+  if (!grupo) {
+    const mes = MESES_LARGOS[item.data.fecha.getMonth()] ?? '';
+    grupo = {
+      clave,
+      etiqueta: `${mes.charAt(0).toUpperCase()}${mes.slice(1)} de ${formatoAnio(item.data.fecha)}`,
+      items: [],
+    };
+    gruposBitacora.push(grupo);
+  }
+  grupo.items.push(item);
+}
 ---
 
 <BaseLayout
@@ -75,22 +94,8 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
   <main id="contenido" class="el-margen">
     <div class="el-margen__rule" aria-hidden="true"></div>
     <!-- Hero -->
-    <section
-      id="inicio"
-      class="el-margen__section pt-8 pb-16 md:pt-10 md:pb-24"
-    >
-      <div class="el-margen__mark hidden md:block">
-        {
-          ultimo && (
-            <>
-              <p class="text-red-text font-display text-xl">
-                {formatoFecha(ultimo.data.fecha)}
-              </p>
-              <p class="text-muted text-xs">{formatoAnio(ultimo.data.fecha)}</p>
-            </>
-          )
-        }
-      </div>
+    <section id="inicio" class="el-margen__section">
+      <div class="el-margen__mark hidden md:block" aria-hidden="true"></div>
       <div class="el-margen__content">
         <h1 class="hero-title font-display">
           Herramientas para docentes, hechas desde adentro de la escuela.
@@ -116,7 +121,13 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
 
         {
           ultimo && (
-            <div class="border-line mt-14 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:gap-6">
+            <div class="border-line relative mt-14 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:gap-6">
+              <div class="margen-nota hidden md:block" aria-hidden="true">
+                <p class="text-muted text-xs">Lo último</p>
+                <p class="text-red-text font-display text-xl">
+                  {formatoFecha(ultimo.data.fecha)}
+                </p>
+              </div>
               <p class="text-red-text sm:hidden text-sm font-semibold">
                 Lo último · {formatoFechaLarga(ultimo.data.fecha)}
               </p>
@@ -124,11 +135,11 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
                 <Picture
                   src={ultimo.data.captura}
                   alt=""
-                  width={120}
-                  height={75}
-                  widths={[120, 240]}
+                  width={112}
+                  height={70}
+                  widths={[112, 224]}
                   formats={['webp']}
-                  class="border-line h-[75px] w-[120px] shrink-0 rounded-[10px] border object-cover"
+                  class="border-line h-[70px] w-[112px] shrink-0 rounded-[10px] border object-cover object-top"
                 />
                 <div>
                   <p class="font-display text-lg font-bold">
@@ -158,7 +169,7 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
     </section>
 
     <!-- Quiénes somos -->
-    <section id="quienes" class="el-margen__section py-16 md:py-24">
+    <section id="quienes" class="el-margen__section">
       <p class="el-margen__mark hidden md:block">Quiénes somos</p>
       <div class="el-margen__content">
         <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
@@ -197,7 +208,7 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
     </section>
 
     <!-- Herramientas -->
-    <section id="herramientas" class="el-margen__section py-16 md:py-24">
+    <section id="herramientas" class="el-margen__section">
       <p class="el-margen__mark hidden md:block">Herramientas</p>
       <div class="el-margen__content">
         <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
@@ -233,7 +244,7 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
                       sizes="(min-width: 1024px) 33vw, 100vw"
                       formats={['webp']}
                       loading={index === 0 ? 'eager' : 'lazy'}
-                      class="border-line aspect-[9/16] w-full rounded-[10px] border object-cover object-top"
+                      class="border-line aspect-[4/5] w-full rounded-[10px] border object-cover object-top"
                     />
                   ) : (
                     <Picture
@@ -300,7 +311,7 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
     </section>
 
     <!-- Bitácora -->
-    <section id="bitacora" class="el-margen__section py-16 md:py-24">
+    <section id="bitacora" class="el-margen__section">
       <p class="el-margen__mark hidden md:block">Bitácora</p>
       <div class="el-margen__content">
         <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
@@ -342,78 +353,86 @@ const formatoAnio = (fecha: Date) => fecha.getFullYear();
           </button>
         </div>
 
-        <ul
-          class="mt-8 flex flex-col gap-8 bg-[repeating-linear-gradient(to_bottom,var(--color-rule)_0,var(--color-rule)_1px,transparent_1px,transparent_2rem)] py-2"
-          id="bitacora-lista"
-        >
+        <div class="mt-8 flex flex-col gap-10" id="bitacora-lista">
           {
-            bitacora.map((item) => (
-              <li
-                data-tipo={item.data.tipo}
-                class="flex flex-col gap-3 sm:flex-row sm:gap-6"
-              >
-                <p class="text-red-text font-display text-sm sm:hidden">
-                  {formatoFecha(item.data.fecha)}
+            gruposBitacora.map((grupo) => (
+              <div>
+                <p class="font-display text-muted text-[1.25rem]">
+                  {grupo.etiqueta}
                 </p>
-                <div class="hidden shrink-0 sm:block">
-                  <p class="text-red-text font-display text-xl">
-                    {formatoFecha(item.data.fecha)}
-                  </p>
-                  <p class="text-muted text-xs">
-                    {formatoAnio(item.data.fecha)}
-                  </p>
-                </div>
-                <div class="flex gap-4">
-                  <Picture
-                    src={item.data.captura}
-                    alt=""
-                    width={176}
-                    height={110}
-                    widths={[96, 176, 352]}
-                    sizes="(min-width: 640px) 176px, 96px"
-                    formats={['webp']}
-                    loading="lazy"
-                    class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover sm:h-[110px] sm:w-[176px]"
-                  />
-                  <div>
-                    <p class="font-display text-[1.25rem] font-semibold">
-                      {item.data.nombre}
-                      <span
-                        class:list={[
-                          'ml-2 inline-block rounded px-2 py-0.5 align-middle text-xs font-semibold',
-                          ESTADO_CLASS[item.data.estado],
-                        ]}
-                        style="border-width:1px;border-style:solid"
-                      >
-                        {ESTADO_LABEL[item.data.estado]}
-                      </span>
-                      {item.data.nivel && (
-                        <span class="text-muted ml-2 align-middle text-sm">
-                          {item.data.nivel}
-                        </span>
-                      )}
-                    </p>
-                    <p class="text-muted mt-1 text-sm">{item.data.resumen}</p>
-                    <a
-                      href={item.data.url}
-                      target="_blank"
-                      rel="noopener"
-                      class="hover:text-red-text mt-1 inline-block text-sm font-semibold underline underline-offset-4"
+                <ul class="mt-4 flex flex-col gap-8">
+                  {grupo.items.map((item) => (
+                    <li
+                      data-tipo={item.data.tipo}
+                      class="relative flex flex-col gap-3"
                     >
-                      Abrir {item.data.nombre}
-                      <span class="sr-only"> (se abre en otra pestaña)</span>
-                    </a>
-                  </div>
-                </div>
-              </li>
+                      <div class="margen-nota hidden md:block" aria-hidden="true">
+                        <p class="text-red-text font-display text-sm">
+                          {formatoFecha(item.data.fecha)}
+                        </p>
+                      </div>
+                      <p class="text-red-text font-display text-sm md:hidden">
+                        {formatoFecha(item.data.fecha)}
+                      </p>
+                      <div class="flex gap-4">
+                        <Picture
+                          src={item.data.captura}
+                          alt=""
+                          width={176}
+                          height={110}
+                          widths={[96, 176, 352]}
+                          sizes="(min-width: 640px) 176px, 96px"
+                          formats={['webp']}
+                          loading="lazy"
+                          class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover sm:h-[110px] sm:w-[176px]"
+                        />
+                        <div>
+                          <p class="font-display text-[1.25rem] font-semibold">
+                            {item.data.nombre}
+                            <span
+                              class:list={[
+                                'ml-2 inline-block rounded px-2 py-0.5 align-middle text-xs font-semibold',
+                                ESTADO_CLASS[item.data.estado],
+                              ]}
+                              style="border-width:1px;border-style:solid"
+                            >
+                              {ESTADO_LABEL[item.data.estado]}
+                            </span>
+                            {item.data.nivel && (
+                              <span class="text-muted ml-2 align-middle text-sm">
+                                {item.data.nivel}
+                              </span>
+                            )}
+                          </p>
+                          <p class="text-muted mt-1 text-sm">
+                            {item.data.resumen}
+                          </p>
+                          <a
+                            href={item.data.url}
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-red-text mt-1 inline-block text-sm font-semibold underline underline-offset-4"
+                          >
+                            Abrir {item.data.nombre}
+                            <span class="sr-only">
+                              {' '}
+                              (se abre en otra pestaña)
+                            </span>
+                          </a>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))
           }
-        </ul>
+        </div>
       </div>
     </section>
 
     <!-- Sumate -->
-    <section id="sumate" class="el-margen__section py-16 md:py-24">
+    <section id="sumate" class="el-margen__section">
       <p class="el-margen__mark hidden md:block">Sumate</p>
       <div class="el-margen__content">
         <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
