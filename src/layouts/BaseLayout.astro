@@ -1,6 +1,5 @@
 ---
-import ChatBot from '@/components/react/ChatBot';
-import '@/styles/global.css';
+import '@/styles/site.css';
 
 export interface Props {
   title: string;
@@ -23,7 +22,16 @@ const socialImage = new URL('/og.svg', Astro.site);
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f7f5ef" />
+    <meta
+      name="theme-color"
+      content="#f7f5ef"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1b221f"
+      media="(prefers-color-scheme: dark)"
+    />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:type" content="website" />
@@ -43,105 +51,12 @@ const socialImage = new URL('/og.svg', Astro.site);
     <title>{title}</title>
   </head>
   <body>
-    <div class="scroll-progress" aria-hidden="true"></div>
     <a
       href="#contenido"
-      class="bg-ink text-surface fixed top-3 left-3 z-[100] -translate-y-20 rounded-[var(--radius-ui)] px-4 py-3 text-sm font-bold transition-transform focus:translate-y-0"
+      class="bg-ink text-surface fixed top-3 left-3 z-[100] -translate-y-20 rounded-lg px-4 py-3 text-sm font-bold transition-transform focus:translate-y-0"
     >
       Ir al contenido
     </a>
     <slot />
-    <ChatBot client:idle />
-    <script is:inline>
-      const revealElements = Array.from(document.querySelectorAll('.reveal'));
-
-      const reveal = (element) => {
-        element.classList.add('is-visible');
-        observer.unobserve(element);
-      };
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              reveal(entry.target);
-            }
-          }
-        },
-        { threshold: 0.01, rootMargin: '0px 0px -8% 0px' },
-      );
-
-      const revealPassedElements = () => {
-        const revealLine = window.innerHeight * 0.92;
-        for (const element of revealElements) {
-          if (
-            !element.classList.contains('is-visible') &&
-            element.getBoundingClientRect().top <= revealLine
-          ) {
-            reveal(element);
-          }
-        }
-      };
-
-      revealElements.forEach((element) => observer.observe(element));
-      requestAnimationFrame(revealPassedElements);
-
-      const layoutObserver = new ResizeObserver(() => {
-        requestAnimationFrame(revealPassedElements);
-      });
-      layoutObserver.observe(document.body);
-
-      const reducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      const counterElements = Array.from(
-        document.querySelectorAll('[data-count]'),
-      );
-
-      const setCounter = (element, value) => {
-        const suffix = element.dataset.suffix ?? '';
-        element.textContent = `${Math.round(value).toLocaleString('es-AR')}${suffix}`;
-      };
-
-      const animateCounter = (element) => {
-        const target = Number(element.dataset.count ?? 0);
-        const currentValue = Number(
-          (element.textContent ?? '').replace(/[^0-9.-]/g, ''),
-        );
-        const startValue = Number.isFinite(currentValue)
-          ? currentValue
-          : target;
-        if (reducedMotion) {
-          setCounter(element, target);
-          return;
-        }
-
-        const duration = 900;
-        const startTime = performance.now();
-
-        const tick = (time) => {
-          const progress = Math.min((time - startTime) / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setCounter(element, startValue + (target - startValue) * eased);
-          if (progress < 1) requestAnimationFrame(tick);
-        };
-
-        requestAnimationFrame(tick);
-      };
-
-      const counterObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              animateCounter(entry.target);
-              counterObserver.unobserve(entry.target);
-            }
-          }
-        },
-        { threshold: 0.5 },
-      );
-
-      counterElements.forEach((element) => counterObserver.observe(element));
-    </script>
   </body>
 </html>

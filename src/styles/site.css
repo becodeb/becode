@@ -1,0 +1,202 @@
+/* Public site stylesheet. Portal/admin/auth keep using global.css + PortalLayout — do not merge. */
+@import 'tailwindcss';
+@source '../';
+
+@import '@fontsource-variable/outfit';
+@import '@fontsource-variable/manrope';
+
+@theme {
+  --color-paper: #f7f5ef;
+  --color-surface: #fffdf8;
+  --color-ink: #151515;
+  --color-muted: #69655e;
+  --color-line: #e1ddd4;
+  --color-red: #d3311d;
+  --color-red-text: #c42b18;
+  --color-rule: #d6e0ea;
+
+  --font-display: 'Outfit Variable', Arial, sans-serif;
+  --font-body: 'Manrope Variable', Arial, sans-serif;
+
+  --text-xs: 0.875rem;
+  --text-sm: 1.0625rem;
+  --text-md: 1.3125rem;
+  --text-lg: 1.75rem;
+  --text-xl: 2.5rem;
+  --text-hero: clamp(2.6rem, 6.4vw, 5.6rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #1b221f;
+    --color-surface: #222b27;
+    --color-ink: #eceae2;
+    --color-muted: #a6aba3;
+    --color-line: #34403a;
+    --color-red: #f0624a;
+    --color-red-text: #f27a64;
+    --color-rule: #2b3631;
+  }
+}
+
+/*
+ * Shape rule for the public site (keeps the brand consistent across sections):
+ * - buttons / inputs: 8px radius
+ * - screenshots: 10px radius, 1px solid border in --color-line
+ * - status tags: 4px radius
+ */
+
+:root {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 650;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.hero-title {
+  font-size: var(--text-hero);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+a,
+button,
+input,
+textarea,
+select,
+summary {
+  outline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-red);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * El margen: the notebook's red margin line, as ONE continuous page grid for
+ * the whole <main>. Each <section class="el-margen__section"> becomes
+ * `display: contents` on desktop so its margin-mark and content land as grid
+ * items in the shared columns (one row per section); on mobile the grid
+ * collapses and the section renders as a normal block with the margin
+ * texts inline above their content.
+ */
+main.el-margen {
+  display: block;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 768px) {
+  main.el-margen {
+    display: grid;
+    grid-template-columns: 9rem 2px minmax(0, 68rem);
+    column-gap: 2rem;
+    padding-inline: 2rem;
+  }
+}
+
+.el-margen__rule {
+  display: none;
+  background: var(--color-red);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+@media (min-width: 768px) {
+  .el-margen__rule {
+    display: block;
+    grid-column: 2;
+    grid-row: 1 / -1;
+  }
+}
+
+html.motion-ready .el-margen__rule {
+  animation: draw-margin 900ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .el-margen__rule {
+    transform: scaleY(1);
+    animation: none;
+  }
+}
+
+@keyframes draw-margin {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.el-margen__mark {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+@media (min-width: 768px) {
+  .el-margen__section {
+    display: contents;
+  }
+
+  .el-margen__mark {
+    grid-column: 1;
+  }
+
+  .el-margen__content {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 767px) {
+  .el-margen__section {
+    position: relative;
+    display: block;
+    padding-left: 30px;
+    padding-right: 16px;
+  }
+
+  .el-margen__section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 14px;
+    width: 3px;
+    background: var(--color-red);
+  }
+}

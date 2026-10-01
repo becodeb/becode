@@ -1,7 +1,8 @@
 ---
 export const prerender = true;
 
-import Footer from '@/components/astro/Footer.astro';
+import Footer from '@/components/site/Footer.astro';
+import Header from '@/components/site/Header.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
@@ -9,30 +10,12 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   title="Términos y condiciones | becode"
   description="Condiciones de uso, contratación, privacidad y propiedad intelectual de becode."
 >
-  <header
-    class="border-line bg-paper/95 sticky top-0 z-50 border-b backdrop-blur"
-  >
-    <div class="shell flex h-16 items-center justify-between">
-      <a
-        href="/"
-        class="font-display text-2xl font-bold"
-        aria-label="Volver a becode"
-      >
-        be<span class="text-signal">/</span>code
-      </a>
-      <a
-        href="/"
-        class="border-line hover:border-ink rounded-[var(--radius-ui)] border px-4 py-2 text-sm font-semibold transition-colors"
-      >
-        Volver al sitio
-      </a>
-    </div>
-  </header>
+  <Header />
 
   <main id="contenido">
     <section class="border-line border-b py-16 sm:py-24">
-      <div class="shell">
-        <p class="eyebrow text-signal">Información legal</p>
+      <div class="mx-auto max-w-[1280px] px-4 md:px-8">
+        <p class="text-red-text text-sm font-semibold">Información legal</p>
         <h1
           class="font-display mt-5 max-w-4xl text-5xl leading-[0.95] font-bold sm:text-7xl"
         >
@@ -43,14 +26,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
           Estas condiciones explican cómo funciona el sitio y el marco general
           de los servicios de becode.
         </p>
-        <p class="text-dim mt-8 font-mono text-xs uppercase">
+        <p class="text-muted mt-8 text-xs">
           Última actualización: 15 de julio de 2026
         </p>
       </div>
     </section>
 
     <div
-      class="shell grid gap-12 py-16 lg:grid-cols-[15rem_1fr] lg:gap-20 lg:py-24"
+      class="mx-auto grid max-w-[1280px] gap-12 px-4 py-16 md:px-8 lg:grid-cols-[15rem_1fr] lg:gap-20 lg:py-24"
     >
       <aside class="lg:sticky lg:top-24 lg:self-start">
         <p class="font-display text-lg font-bold">En pocas palabras</p>
@@ -60,7 +43,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
         </p>
         <a
           href="mailto:hola@becode.com.ar"
-          class="text-signal mt-5 inline-block text-sm font-semibold underline underline-offset-4"
+          class="text-red-text mt-5 inline-block text-sm font-semibold underline underline-offset-4"
         >
           hola@becode.com.ar
         </a>
@@ -193,7 +176,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     </div>
   </main>
 
-  <Footer showLegalNote={false} />
+  <Footer />
 </BaseLayout>
 
 <style>
@@ -216,7 +199,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   }
 
   .legal-copy a {
-    color: var(--color-signal);
+    color: var(--color-red-text);
     font-weight: 650;
     text-decoration: underline;
     text-underline-offset: 0.2em;

@@ -2,33 +2,603 @@
 export const prerender = true;
 
 import { getCollection } from 'astro:content';
-import Contact from '@/components/astro/Contact.astro';
-import Footer from '@/components/astro/Footer.astro';
-import Header from '@/components/astro/Header.astro';
-import Hero from '@/components/astro/Hero.astro';
-import Process from '@/components/astro/Process.astro';
-import ProjectSection from '@/components/astro/ProjectSection.astro';
-import Services from '@/components/astro/Services.astro';
-import Team from '@/components/astro/Team.astro';
+import { Picture } from 'astro:assets';
+import Footer from '@/components/site/Footer.astro';
+import Header from '@/components/site/Header.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
-const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.order - b.data.order,
+const proyectos = await getCollection('proyectos');
+
+const herramientas = proyectos
+  .filter((p) => p.data.tipo === 'herramienta')
+  .sort((a, b) => (a.data.orden ?? 0) - (b.data.orden ?? 0));
+
+const bitacora = [...proyectos].sort(
+  (a, b) => b.data.fecha.getTime() - a.data.fecha.getTime(),
 );
+
+const ultimo = bitacora[0];
+
+const ESTADO_LABEL: Record<string, string> = {
+  'en-uso': 'En uso',
+  piloto: 'Piloto',
+  experimento: 'Experimento',
+};
+
+const ESTADO_CLASS: Record<string, string> = {
+  'en-uso': 'border-ink text-ink',
+  piloto: 'border-red-text text-red-text',
+  experimento: 'border-muted text-muted',
+};
+
+const MESES_CORTOS = [
+  'ene',
+  'feb',
+  'mar',
+  'abr',
+  'may',
+  'jun',
+  'jul',
+  'ago',
+  'sep',
+  'oct',
+  'nov',
+  'dic',
+];
+const MESES_LARGOS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+
+const formatoFecha = (fecha: Date) =>
+  `${fecha.getDate()} ${MESES_CORTOS[fecha.getMonth()]}`;
+const formatoFechaLarga = (fecha: Date) =>
+  `${fecha.getDate()} de ${MESES_LARGOS[fecha.getMonth()]}`;
+const formatoAnio = (fecha: Date) => fecha.getFullYear();
 ---
 
 <BaseLayout
-  title="becode | Software a medida y productos digitales"
-  description="Diseñamos y desarrollamos productos web, sistemas de gestión y plataformas educativas a medida. Software claro para operaciones reales."
+  title="becode | Herramientas para docentes, hechas desde adentro de la escuela"
+  description="becode diseña herramientas educativas con los docentes que las usan: Kodu, Testra, Echo y Loop, además de recursos y experimentos de aula."
 >
   <Header />
-  <main id="contenido">
-    <Hero projects={projects} />
-    <ProjectSection projects={projects} />
-    <Services />
-    <Process />
-    <Team />
-    <Contact />
+  <main id="contenido" class="el-margen">
+    <div class="el-margen__rule" aria-hidden="true"></div>
+    <!-- Hero -->
+    <section
+      id="inicio"
+      class="el-margen__section pt-8 pb-16 md:pt-10 md:pb-24"
+    >
+      <div class="el-margen__mark hidden md:block">
+        {
+          ultimo && (
+            <>
+              <p class="text-red-text font-display text-xl">
+                {formatoFecha(ultimo.data.fecha)}
+              </p>
+              <p class="text-muted text-xs">{formatoAnio(ultimo.data.fecha)}</p>
+            </>
+          )
+        }
+      </div>
+      <div class="el-margen__content">
+        <h1 class="hero-title font-display">
+          Herramientas para docentes, hechas desde adentro de la escuela.
+        </h1>
+        <p class="text-muted mt-6 max-w-[34rem] text-[1.0625rem] sm:text-[1.1875rem]">
+          Somos tres egresados del Northfield School. Hoy trabajamos ahí, y
+          cada herramienta la armamos con los docentes que la usan.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <a
+            href="#herramientas"
+            class="bg-ink text-paper rounded-lg px-5 py-3 text-sm font-semibold"
+          >
+            Ver las herramientas
+          </a>
+          <a
+            href="#sumate"
+            class="text-ink text-sm font-semibold underline underline-offset-4"
+          >
+            Sumate
+          </a>
+        </div>
+
+        {
+          ultimo && (
+            <div class="border-line mt-14 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:gap-6">
+              <p class="text-red-text sm:hidden text-sm font-semibold">
+                Lo último · {formatoFechaLarga(ultimo.data.fecha)}
+              </p>
+              <div class="flex items-center gap-4">
+                <Picture
+                  src={ultimo.data.captura}
+                  alt=""
+                  width={120}
+                  height={75}
+                  widths={[120, 240]}
+                  formats={['webp']}
+                  class="border-line h-[75px] w-[120px] shrink-0 rounded-[10px] border object-cover"
+                />
+                <div>
+                  <p class="font-display text-lg font-bold">
+                    {ultimo.data.nombre}
+                  </p>
+                  <p class="text-muted text-sm">{ultimo.data.resumen}</p>
+                  <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold">
+                    <a
+                      href={ultimo.data.url}
+                      class="hover:text-red-text underline underline-offset-4"
+                    >
+                      Abrir {ultimo.data.nombre}
+                    </a>
+                    <a
+                      href="#bitacora"
+                      class="hover:text-red-text underline underline-offset-4"
+                    >
+                      Ver la bitácora
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- Quiénes somos -->
+    <section id="quienes" class="el-margen__section py-16 md:py-24">
+      <p class="el-margen__mark hidden md:block">Quiénes somos</p>
+      <div class="el-margen__content">
+        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
+          Quiénes somos
+        </p>
+        <p
+          class="font-display max-w-[22ch] text-[clamp(1.75rem,4.5vw,2.6rem)] leading-tight font-semibold"
+        >
+          No imaginamos los problemas de la escuela desde afuera. Los vemos
+          todos los días.
+        </p>
+
+        <ul class="border-line mt-10 max-w-xl border-t">
+          {
+            [
+              'Ezequiel Mastropietro',
+              'Bautista Goñi',
+              'Ezequiel Fernandez Cruz',
+            ].map((nombre) => (
+              <li class="border-line border-b py-4">
+                <span class="font-display text-ink text-[1.6rem] sm:text-[2rem]">
+                  {nombre}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="text-muted mt-10 max-w-[40rem] text-[1.0625rem]">
+          Egresados del Northfield School y estudiantes de Ingeniería en
+          Sistemas en la UTN. Volvimos al colegio como asistentes de
+          tecnología y profes de programación y robótica, y construimos cada
+          herramienta mano a mano con los docentes.
+        </p>
+      </div>
+    </section>
+
+    <!-- Herramientas -->
+    <section id="herramientas" class="el-margen__section py-16 md:py-24">
+      <p class="el-margen__mark hidden md:block">Herramientas</p>
+      <div class="el-margen__content">
+        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
+          Herramientas
+        </p>
+        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
+          Para crear, evaluar, registrar y compartir
+        </h2>
+
+        <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-3">
+          {
+            herramientas.map((item, index) => {
+              // Grid placement is data-driven by index, not by a hardcoded
+              // product name: item 0 leads row 1 (wide); item 3 (the one
+              // flagged `formato: 'movil'`) shares row 1, narrow; items 1-2
+              // fill row 2 evenly.
+              const placementClass =
+                index === 0
+                  ? 'lg:col-span-2 lg:col-start-1 lg:row-start-1'
+                  : index === 3
+                    ? 'lg:col-span-1 lg:col-start-3 lg:row-start-1'
+                    : index === 1
+                      ? 'lg:col-span-1 lg:col-start-1 lg:row-start-2'
+                      : 'lg:col-span-1 lg:col-start-2 lg:row-start-2';
+              const isMovil = item.data.formato === 'movil';
+              return (
+                <article class:list={['flex flex-col', placementClass]}>
+                  {isMovil && item.data.capturaMovil ? (
+                    <Picture
+                      src={item.data.capturaMovil}
+                      alt={`Captura de ${item.data.nombre}`}
+                      widths={[480, 720]}
+                      sizes="(min-width: 1024px) 33vw, 100vw"
+                      formats={['webp']}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      class="border-line aspect-[9/16] w-full rounded-[10px] border object-cover object-top"
+                    />
+                  ) : (
+                    <Picture
+                      src={item.data.captura}
+                      alt={`Captura de ${item.data.nombre}`}
+                      widths={[480, 768, 1024]}
+                      sizes="(min-width: 1024px) 66vw, 100vw"
+                      formats={['webp']}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      class="border-line aspect-[4/5] w-full rounded-[10px] border object-cover object-top sm:aspect-video"
+                    />
+                  )}
+                  <span
+                    class="mt-4 block h-1 w-10"
+                    style={`background:${item.data.color ?? 'var(--color-ink)'}`}
+                  />
+                  <h3 class="font-display mt-3 text-[1.75rem] font-semibold">
+                    {item.data.nombre}
+                  </h3>
+                  <span
+                    class:list={[
+                      'mt-2 inline-block w-fit rounded px-2 py-0.5 text-xs font-semibold',
+                      ESTADO_CLASS[item.data.estado],
+                    ]}
+                    style="border-width:1px;border-style:solid"
+                  >
+                    {ESTADO_LABEL[item.data.estado]}
+                  </span>
+                  {item.data.titular && (
+                    <p class="font-display mt-3 text-[1.25rem] font-semibold">
+                      {item.data.titular}
+                    </p>
+                  )}
+                  {item.data.detalle && (
+                    <p class="text-ink/90 mt-2 text-[1.0625rem]">
+                      {item.data.detalle}
+                    </p>
+                  )}
+                  {item.data.dato && (
+                    <p class="text-muted mt-2 text-sm">{item.data.dato}</p>
+                  )}
+                  <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <a
+                      href={item.data.url}
+                      class="border-ink rounded-lg border px-4 py-2 text-sm font-semibold"
+                    >
+                      Abrir {item.data.nombre}
+                    </a>
+                    {item.data.acciones?.map((accion) => (
+                      <a
+                        href={accion.url}
+                        class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+                      >
+                        {accion.etiqueta}
+                      </a>
+                    ))}
+                  </div>
+                </article>
+              );
+            })
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Bitácora -->
+    <section id="bitacora" class="el-margen__section py-16 md:py-24">
+      <p class="el-margen__mark hidden md:block">Bitácora</p>
+      <div class="el-margen__content">
+        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
+          Bitácora
+        </p>
+        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
+          Todo lo que publicamos, de lo más nuevo a lo más viejo
+        </h2>
+
+        <div
+          class="mt-6 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filtrar la bitácora"
+          id="bitacora-filtros"
+        >
+          <button
+            type="button"
+            class="border-ink rounded-lg border px-4 py-2 text-sm font-semibold"
+            data-filtro="todo"
+            aria-pressed="true"
+          >
+            Todo
+          </button>
+          <button
+            type="button"
+            class="border-line rounded-lg border px-4 py-2 text-sm font-semibold"
+            data-filtro="herramienta"
+            aria-pressed="false"
+          >
+            Herramientas
+          </button>
+          <button
+            type="button"
+            class="border-line rounded-lg border px-4 py-2 text-sm font-semibold"
+            data-filtro="recurso"
+            aria-pressed="false"
+          >
+            Recursos y experimentos
+          </button>
+        </div>
+
+        <ul
+          class="mt-8 flex flex-col gap-8 bg-[repeating-linear-gradient(to_bottom,var(--color-rule)_0,var(--color-rule)_1px,transparent_1px,transparent_2rem)] py-2"
+          id="bitacora-lista"
+        >
+          {
+            bitacora.map((item) => (
+              <li
+                data-tipo={item.data.tipo}
+                class="flex flex-col gap-3 sm:flex-row sm:gap-6"
+              >
+                <p class="text-red-text font-display text-sm sm:hidden">
+                  {formatoFecha(item.data.fecha)}
+                </p>
+                <div class="hidden shrink-0 sm:block">
+                  <p class="text-red-text font-display text-xl">
+                    {formatoFecha(item.data.fecha)}
+                  </p>
+                  <p class="text-muted text-xs">
+                    {formatoAnio(item.data.fecha)}
+                  </p>
+                </div>
+                <div class="flex gap-4">
+                  <Picture
+                    src={item.data.captura}
+                    alt=""
+                    width={176}
+                    height={110}
+                    widths={[96, 176, 352]}
+                    sizes="(min-width: 640px) 176px, 96px"
+                    formats={['webp']}
+                    loading="lazy"
+                    class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover sm:h-[110px] sm:w-[176px]"
+                  />
+                  <div>
+                    <p class="font-display text-[1.25rem] font-semibold">
+                      {item.data.nombre}
+                      <span
+                        class:list={[
+                          'ml-2 inline-block rounded px-2 py-0.5 align-middle text-xs font-semibold',
+                          ESTADO_CLASS[item.data.estado],
+                        ]}
+                        style="border-width:1px;border-style:solid"
+                      >
+                        {ESTADO_LABEL[item.data.estado]}
+                      </span>
+                      {item.data.nivel && (
+                        <span class="text-muted ml-2 align-middle text-sm">
+                          {item.data.nivel}
+                        </span>
+                      )}
+                    </p>
+                    <p class="text-muted mt-1 text-sm">{item.data.resumen}</p>
+                    <a
+                      href={item.data.url}
+                      target="_blank"
+                      rel="noopener"
+                      class="hover:text-red-text mt-1 inline-block text-sm font-semibold underline underline-offset-4"
+                    >
+                      Abrir {item.data.nombre}
+                      <span class="sr-only"> (se abre en otra pestaña)</span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Sumate -->
+    <section id="sumate" class="el-margen__section py-16 md:py-24">
+      <p class="el-margen__mark hidden md:block">Sumate</p>
+      <div class="el-margen__content">
+        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
+          Sumate
+        </p>
+        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
+          Probalas con tu curso o con tu escuela
+        </h2>
+
+        <div class="mt-10 grid grid-cols-1 gap-10 md:grid-cols-2">
+          <div class="border-line border-t pt-6">
+            <h3 class="font-display text-xl font-semibold">
+              Si sos docente
+            </h3>
+            <p class="text-muted mt-3 text-[1.0625rem]">
+              Testra es gratis y Kodu tiene una versión gratuita. Probalas con
+              tu curso y contanos qué te falta.
+            </p>
+            <div class="mt-4 flex flex-col items-start gap-2">
+              <a
+                href="https://testra.becode.com.ar/demo"
+                class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+              >
+                Probar la demo de Testra
+              </a>
+              <a
+                href="https://kodu.becode.com.ar"
+                class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+              >
+                Crear un recurso en Kodu
+              </a>
+            </div>
+          </div>
+          <div class="border-line border-t pt-6">
+            <h3 class="font-display text-xl font-semibold">
+              Si sos de una escuela
+            </h3>
+            <p class="text-muted mt-3 text-[1.0625rem]">
+              Licencia por sede y por ciclo lectivo, con capacitación para
+              docentes y directivos incluida. No cobramos por docente.
+            </p>
+            <p class="text-muted mt-3 text-[1.0625rem]">
+              Para redes con varias sedes armamos una propuesta a medida.
+            </p>
+          </div>
+        </div>
+
+        <form
+          id="form-sumate"
+          class="border-line mt-14 max-w-xl border-t pt-8"
+          novalidate
+        >
+          <div class="flex flex-col gap-5">
+            <div>
+              <label for="f-nombre" class="block text-sm font-semibold"
+                >Nombre</label
+              >
+              <input
+                id="f-nombre"
+                name="nombre"
+                type="text"
+                required
+                class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
+              />
+              <p class="error-text text-red-text mt-1 hidden text-sm" />
+            </div>
+            <div>
+              <label for="f-escuela" class="block text-sm font-semibold"
+                >Escuela</label
+              >
+              <input
+                id="f-escuela"
+                name="escuela"
+                type="text"
+                required
+                class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
+              />
+              <p class="error-text text-red-text mt-1 hidden text-sm" />
+            </div>
+            <div>
+              <label for="f-rol" class="block text-sm font-semibold"
+                >Sos…</label
+              >
+              <select
+                id="f-rol"
+                name="rol"
+                required
+                class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
+              >
+                <option value="">Elegí una opción</option>
+                <option value="Docente">Docente</option>
+                <option value="Directivo o coordinador"
+                  >Directivo o coordinador</option
+                >
+                <option value="Otro">Otro</option>
+              </select>
+              <p class="error-text text-red-text mt-1 hidden text-sm" />
+            </div>
+            <div>
+              <label for="f-mensaje" class="block text-sm font-semibold"
+                >Mensaje</label
+              >
+              <textarea
+                id="f-mensaje"
+                name="mensaje"
+                rows="4"
+                required
+                class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
+              ></textarea>
+              <p class="error-text text-red-text mt-1 hidden text-sm" />
+            </div>
+            <button
+              type="submit"
+              class="bg-ink text-paper w-fit rounded-lg px-5 py-3 text-sm font-semibold"
+            >
+              Enviar mensaje
+            </button>
+            <p class="text-muted text-sm">
+              Se abre tu correo con el mensaje listo. También podés escribir a
+              hola@becode.com.ar.
+            </p>
+          </div>
+        </form>
+      </div>
+    </section>
   </main>
   <Footer />
 </BaseLayout>
+
+<script>
+  const filtros = document.getElementById('bitacora-filtros');
+  const lista = document.getElementById('bitacora-lista');
+
+  filtros?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement)?.closest('button');
+    if (!button || !lista) return;
+    const filtro = button.dataset.filtro ?? 'todo';
+
+    filtros
+      .querySelectorAll('button')
+      .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    button.setAttribute('aria-pressed', 'true');
+
+    lista.querySelectorAll<HTMLElement>('li[data-tipo]').forEach((item) => {
+      const visible = filtro === 'todo' || item.dataset.tipo === filtro;
+      item.hidden = !visible;
+    });
+  });
+
+  const form = document.getElementById('form-sumate') as HTMLFormElement | null;
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const nombre = String(data.get('nombre') ?? '').trim();
+    const escuela = String(data.get('escuela') ?? '').trim();
+    const rol = String(data.get('rol') ?? '').trim();
+    const mensaje = String(data.get('mensaje') ?? '').trim();
+
+    let valid = true;
+    form.querySelectorAll<HTMLElement>('.error-text').forEach((el) => {
+      el.classList.add('hidden');
+      el.textContent = '';
+    });
+
+    const markError = (fieldId: string, text: string) => {
+      const field = document.getElementById(fieldId);
+      const error = field?.parentElement?.querySelector('.error-text');
+      if (error) {
+        error.textContent = text;
+        error.classList.remove('hidden');
+      }
+      valid = false;
+    };
+
+    if (!nombre) markError('f-nombre', 'Contanos tu nombre.');
+    if (!escuela) markError('f-escuela', 'Contanos de qué escuela sos.');
+    if (!rol) markError('f-rol', 'Elegí una opción.');
+    if (!mensaje) markError('f-mensaje', 'Escribinos un mensaje.');
+
+    if (!valid) return;
+
+    const subject = `Desde becode.com.ar: ${rol} de ${escuela}`;
+    const body = `Nombre: ${nombre}\nEscuela: ${escuela}\nSos: ${rol}\n\n${mensaje}`;
+    const mailto = `mailto:hola@becode.com.ar?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+  });
+</script>
