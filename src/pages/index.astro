@@ -5,6 +5,7 @@ import { getCollection } from 'astro:content';
 import { Picture } from 'astro:assets';
 import Footer from '@/components/site/Footer.astro';
 import Header from '@/components/site/Header.astro';
+import Hero from '@/components/site/Hero.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
 const proyectos = await getCollection('proyectos');
@@ -13,11 +14,15 @@ const herramientas = proyectos
   .filter((p) => p.data.tipo === 'herramienta')
   .sort((a, b) => (a.data.orden ?? 0) - (b.data.orden ?? 0));
 
-const bitacora = [...proyectos].sort(
+const recursos = proyectos
+  .filter((p) => p.data.tipo === 'recurso')
+  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+
+const recursosRecientes = recursos.slice(0, 3);
+
+const todos = [...proyectos].sort(
   (a, b) => b.data.fecha.getTime() - a.data.fecha.getTime(),
 );
-
-const ultimo = bitacora[0];
 
 const ESTADO_LABEL: Record<string, string> = {
   'en-uso': 'En uso',
@@ -31,20 +36,6 @@ const ESTADO_CLASS: Record<string, string> = {
   experimento: 'border-muted text-muted',
 };
 
-const MESES_CORTOS = [
-  'ene',
-  'feb',
-  'mar',
-  'abr',
-  'may',
-  'jun',
-  'jul',
-  'ago',
-  'sep',
-  'oct',
-  'nov',
-  'dic',
-];
 const MESES_LARGOS = [
   'enero',
   'febrero',
@@ -60,30 +51,12 @@ const MESES_LARGOS = [
   'diciembre',
 ];
 
-const formatoFecha = (fecha: Date) =>
-  `${fecha.getDate()} ${MESES_CORTOS[fecha.getMonth()]}`;
 const formatoFechaLarga = (fecha: Date) =>
   `${fecha.getDate()} de ${MESES_LARGOS[fecha.getMonth()]}`;
-const formatoAnio = (fecha: Date) => fecha.getFullYear();
-
-// Bitácora is grouped by month so the margin date doesn't need to repeat
-// the year on every entry; `bitacora` stays sorted desc, so groups come out
-// desc too.
-const gruposBitacora: { clave: string; etiqueta: string; items: typeof bitacora }[] = [];
-for (const item of bitacora) {
-  const clave = `${item.data.fecha.getFullYear()}-${item.data.fecha.getMonth()}`;
-  let grupo = gruposBitacora.find((g) => g.clave === clave);
-  if (!grupo) {
-    const mes = MESES_LARGOS[item.data.fecha.getMonth()] ?? '';
-    grupo = {
-      clave,
-      etiqueta: `${mes.charAt(0).toUpperCase()}${mes.slice(1)} de ${formatoAnio(item.data.fecha)}`,
-      items: [],
-    };
-    gruposBitacora.push(grupo);
-  }
-  grupo.items.push(item);
-}
+const formatoFechaCorta = (fecha: Date) => {
+  const mes = MESES_LARGOS[fecha.getMonth()] ?? '';
+  return `${fecha.getDate()} ${mes.slice(0, 3)}`;
+};
 ---
 
 <BaseLayout
@@ -91,18 +64,19 @@ for (const item of bitacora) {
   description="becode diseña herramientas educativas con los docentes que las usan: Kodu, Testra, Echo y Loop, además de recursos y experimentos de aula."
 >
   <Header />
-  <main id="contenido" class="el-margen">
-    <div class="el-margen__rule" aria-hidden="true"></div>
+  <main id="contenido">
     <!-- Hero -->
-    <section id="inicio" class="el-margen__section">
-      <div class="el-margen__mark hidden md:block" aria-hidden="true"></div>
-      <div class="el-margen__content">
+    <section
+      id="inicio"
+      class="page-container grid items-center gap-8 pt-6 pb-12 md:pt-10 md:pb-16 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16"
+    >
+      <div>
         <h1 class="hero-title font-display">
           Herramientas para docentes, hechas desde adentro de la escuela.
         </h1>
-        <p class="text-muted mt-6 max-w-[34rem] text-[1.0625rem] sm:text-[1.1875rem]">
-          Somos tres egresados del Northfield School. Hoy trabajamos ahí, y
-          cada herramienta la armamos con los docentes que la usan.
+        <p class="text-muted mt-5 max-w-[32rem] text-[1.0625rem] sm:text-[1.1875rem]">
+          Somos tres egresados del Northfield School que hoy trabajan ahí.
+          Cada herramienta la armamos con los docentes que la usan.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
           <a
@@ -118,66 +92,19 @@ for (const item of bitacora) {
             Sumate
           </a>
         </div>
-
-        {
-          ultimo && (
-            <div class="border-line relative mt-14 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:gap-6">
-              <div class="margen-nota hidden md:block" aria-hidden="true">
-                <p class="text-muted text-xs">Lo último</p>
-                <p class="text-red-text font-display text-xl">
-                  {formatoFecha(ultimo.data.fecha)}
-                </p>
-              </div>
-              <p class="text-red-text sm:hidden text-sm font-semibold">
-                Lo último · {formatoFechaLarga(ultimo.data.fecha)}
-              </p>
-              <div class="flex items-center gap-4">
-                <Picture
-                  src={ultimo.data.captura}
-                  alt=""
-                  width={112}
-                  height={70}
-                  widths={[112, 224]}
-                  formats={['webp']}
-                  pictureAttributes={{ class: 'shrink-0' }}
-                  class="border-line h-[70px] w-[112px] shrink-0 rounded-[10px] border object-cover object-top"
-                />
-                <div>
-                  <p class="font-display text-lg font-bold">
-                    {ultimo.data.nombre}
-                  </p>
-                  <p class="text-muted text-sm">{ultimo.data.resumen}</p>
-                  <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm font-semibold">
-                    <a
-                      href={ultimo.data.url}
-                      class="hover:text-red-text underline underline-offset-4"
-                    >
-                      Abrir {ultimo.data.nombre}
-                    </a>
-                    <a
-                      href="#bitacora"
-                      class="hover:text-red-text underline underline-offset-4"
-                    >
-                      Ver la bitácora
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )
-        }
       </div>
+
+      <Hero herramientas={herramientas} recursos={recursos} />
     </section>
 
     <!-- Quiénes somos -->
-    <section id="quienes" class="el-margen__section">
-      <p class="el-margen__mark hidden md:block">Quiénes somos</p>
-      <div class="el-margen__content">
-        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
+    <section id="quienes" class="page-section">
+      <div class="page-container">
+        <h2 class="font-display text-[1.6rem] font-semibold sm:text-[2rem]">
           Quiénes somos
-        </p>
+        </h2>
         <p
-          class="font-display max-w-[22ch] text-[clamp(1.75rem,4.5vw,2.6rem)] leading-tight font-semibold"
+          class="font-display mt-6 max-w-[22ch] text-[clamp(1.75rem,4.5vw,2.6rem)] leading-tight font-semibold"
         >
           No imaginamos los problemas de la escuela desde afuera. Los vemos
           todos los días.
@@ -209,13 +136,9 @@ for (const item of bitacora) {
     </section>
 
     <!-- Herramientas -->
-    <section id="herramientas" class="el-margen__section">
-      <p class="el-margen__mark hidden md:block">Herramientas</p>
-      <div class="el-margen__content">
-        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
-          Herramientas
-        </p>
-        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
+    <section id="herramientas" class="page-section">
+      <div class="page-container">
+        <h2 class="font-display text-[1.6rem] font-semibold sm:text-[2rem]">
           Para crear, evaluar, registrar y compartir
         </h2>
 
@@ -297,7 +220,7 @@ for (const item of bitacora) {
                     {item.data.acciones?.map((accion) => (
                       <a
                         href={accion.url}
-                        class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+                        class="hover:text-ink hover:underline text-sm font-semibold underline underline-offset-4"
                       >
                         {accion.etiqueta}
                       </a>
@@ -311,136 +234,131 @@ for (const item of bitacora) {
       </div>
     </section>
 
-    <!-- Bitácora -->
-    <section id="bitacora" class="el-margen__section">
-      <p class="el-margen__mark hidden md:block">Bitácora</p>
-      <div class="el-margen__content">
-        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
-          Bitácora
-        </p>
-        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
-          Todo lo que publicamos, de lo más nuevo a lo más viejo
+    <!-- Recursos (bitácora, collapsed) -->
+    <section id="recursos" class="page-section">
+      <div class="page-container">
+        <h2 class="font-display text-[1.6rem] font-semibold sm:text-[2rem]">
+          Recursos y experimentos
         </h2>
+        <p class="text-muted mt-3 max-w-xl text-[1.0625rem]">
+          Juegos, simuladores y actividades que armamos para clases concretas.
+        </p>
 
-        <div
-          class="mt-6 flex flex-wrap gap-2"
-          role="group"
-          aria-label="Filtrar la bitácora"
-          id="bitacora-filtros"
-        >
-          <button
-            type="button"
-            class="border-ink rounded-lg border px-4 py-2 text-sm font-semibold"
-            data-filtro="todo"
-            aria-pressed="true"
-          >
-            Todo
-          </button>
-          <button
-            type="button"
-            class="border-line rounded-lg border px-4 py-2 text-sm font-semibold"
-            data-filtro="herramienta"
-            aria-pressed="false"
-          >
-            Herramientas
-          </button>
-          <button
-            type="button"
-            class="border-line rounded-lg border px-4 py-2 text-sm font-semibold"
-            data-filtro="recurso"
-            aria-pressed="false"
-          >
-            Recursos y experimentos
-          </button>
-        </div>
-
-        <div class="mt-8 flex flex-col gap-10" id="bitacora-lista">
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           {
-            gruposBitacora.map((grupo) => (
-              <div>
-                <p class="font-display text-muted text-[1.25rem]">
-                  {grupo.etiqueta}
+            recursosRecientes.map((item, index) => (
+              <a
+                href={item.data.url}
+                target="_blank"
+                rel="noopener"
+                class="border-line hover:border-ink group flex flex-col rounded-[10px] border p-4 transition-colors"
+              >
+                <Picture
+                  src={item.data.captura}
+                  alt=""
+                  width={400}
+                  height={250}
+                  widths={[400, 600]}
+                  sizes="(min-width: 768px) 33vw, 100vw"
+                  formats={['webp']}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  class="border-line aspect-[16/10] w-full rounded-[10px] border object-cover object-top"
+                />
+                <p class="font-display mt-4 text-[1.125rem] font-semibold">
+                  {item.data.nombre}
                 </p>
-                <ul class="mt-4 flex flex-col gap-8">
-                  {grupo.items.map((item) => (
-                    <li
-                      data-tipo={item.data.tipo}
-                      class="relative flex flex-col gap-3"
-                    >
-                      <div class="margen-nota hidden md:block" aria-hidden="true">
-                        <p class="text-red-text font-display text-[1.25rem] leading-tight">
-                          {formatoFecha(item.data.fecha)}
-                        </p>
-                      </div>
-                      <p class="text-red-text font-display text-base md:hidden">
-                        {formatoFecha(item.data.fecha)}
-                      </p>
-                      <div class="flex gap-4">
-                        <Picture
-                          src={item.data.captura}
-                          alt=""
-                          width={176}
-                          height={110}
-                          widths={[96, 176, 352]}
-                          sizes="(min-width: 640px) 176px, 96px"
-                          formats={['webp']}
-                          loading="lazy"
-                          pictureAttributes={{ class: 'shrink-0' }}
-                          class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover sm:h-[110px] sm:w-[176px]"
-                        />
-                        <div>
-                          <p class="font-display text-[1.25rem] font-semibold">
-                            {item.data.nombre}
-                            <span
-                              class:list={[
-                                'ml-2 inline-block rounded px-2 py-0.5 align-middle text-xs font-semibold',
-                                ESTADO_CLASS[item.data.estado],
-                              ]}
-                              style="border-width:1px;border-style:solid"
-                            >
-                              {ESTADO_LABEL[item.data.estado]}
-                            </span>
-                            {item.data.nivel && (
-                              <span class="text-muted ml-2 align-middle text-sm">
-                                {item.data.nivel}
-                              </span>
-                            )}
-                          </p>
-                          <p class="text-muted mt-1 text-sm">
-                            {item.data.resumen}
-                          </p>
-                          <a
-                            href={item.data.url}
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-red-text mt-1 inline-block text-sm font-semibold underline underline-offset-4"
-                          >
-                            Abrir {item.data.nombre}
-                            <span class="sr-only">
-                              {' '}
-                              (se abre en otra pestaña)
-                            </span>
-                          </a>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <p class="text-muted mt-1 flex flex-wrap items-center gap-2 text-sm">
+                  {item.data.nivel && <span>{item.data.nivel}</span>}
+                  <span
+                    class:list={[
+                      'inline-block rounded px-2 py-0.5 text-xs font-semibold',
+                      ESTADO_CLASS[item.data.estado],
+                    ]}
+                    style="border-width:1px;border-style:solid"
+                  >
+                    {ESTADO_LABEL[item.data.estado]}
+                  </span>
+                </p>
+                <p class="text-muted clamp-2 mt-2 text-sm">
+                  {item.data.resumen}
+                </p>
+                <p class="text-muted mt-3 text-xs">
+                  Publicado el {formatoFechaLarga(item.data.fecha)}
+                </p>
+                <span class="sr-only"> (se abre en otra pestaña)</span>
+              </a>
             ))
           }
         </div>
+
+        <details class="mt-8">
+          <summary
+            class="border-ink flex w-full cursor-pointer items-center justify-between rounded-lg border px-5 py-3 text-sm font-semibold"
+          >
+            <span>Ver todo lo que publicamos ({todos.length})</span>
+            <svg
+              class="chevron h-4 w-4 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+
+          <div class="mt-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
+            {
+              todos.map((item) => (
+                <a
+                  href={item.data.url}
+                  target="_blank"
+                  rel="noopener"
+                  class="hover:bg-surface flex items-center gap-4 rounded-lg p-2 -m-2 transition-colors"
+                >
+                  <Picture
+                    src={item.data.captura}
+                    alt=""
+                    width={96}
+                    height={60}
+                    widths={[96, 192]}
+                    formats={['webp']}
+                    loading="lazy"
+                    pictureAttributes={{ class: 'shrink-0' }}
+                    class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover"
+                  />
+                  <div class="min-w-0">
+                    <p class="font-display text-[1.0625rem] font-semibold">
+                      {item.data.nombre}
+                      <span
+                        class:list={[
+                          'ml-2 inline-block rounded px-2 py-0.5 align-middle text-xs font-semibold',
+                          ESTADO_CLASS[item.data.estado],
+                        ]}
+                        style="border-width:1px;border-style:solid"
+                      >
+                        {ESTADO_LABEL[item.data.estado]}
+                      </span>
+                    </p>
+                    <p class="text-muted mt-0.5 truncate text-sm">
+                      {item.data.nivel ?? item.data.tipo} ·{' '}
+                      {formatoFechaCorta(item.data.fecha)}
+                    </p>
+                  </div>
+                  <span class="sr-only"> (se abre en otra pestaña)</span>
+                </a>
+              ))
+            }
+          </div>
+        </details>
       </div>
     </section>
 
     <!-- Sumate -->
-    <section id="sumate" class="el-margen__section">
-      <p class="el-margen__mark hidden md:block">Sumate</p>
-      <div class="el-margen__content">
-        <p class="text-red-text mb-4 text-sm font-semibold md:hidden">
-          Sumate
-        </p>
-        <h2 class="font-display text-[1.75rem] font-semibold sm:text-[2rem]">
+    <section id="sumate" class="page-section">
+      <div class="page-container">
+        <h2 class="font-display text-[1.6rem] font-semibold sm:text-[2rem]">
           Probalas con tu curso o con tu escuela
         </h2>
 
@@ -456,13 +374,13 @@ for (const item of bitacora) {
             <div class="mt-4 flex flex-col items-start gap-2">
               <a
                 href="https://testra.becode.com.ar/demo"
-                class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+                class="hover:text-ink hover:underline text-sm font-semibold underline underline-offset-4"
               >
                 Probar la demo de Testra
               </a>
               <a
                 href="https://kodu.becode.com.ar"
-                class="hover:text-red-text text-sm font-semibold underline underline-offset-4"
+                class="hover:text-ink hover:underline text-sm font-semibold underline underline-offset-4"
               >
                 Crear un recurso en Kodu
               </a>
@@ -499,7 +417,7 @@ for (const item of bitacora) {
                 required
                 class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
               />
-              <p class="error-text text-red-text mt-1 hidden text-sm" />
+              <p class="error-text text-ink mt-1 hidden text-sm font-semibold" />
             </div>
             <div>
               <label for="f-escuela" class="block text-sm font-semibold"
@@ -512,7 +430,7 @@ for (const item of bitacora) {
                 required
                 class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
               />
-              <p class="error-text text-red-text mt-1 hidden text-sm" />
+              <p class="error-text text-ink mt-1 hidden text-sm font-semibold" />
             </div>
             <div>
               <label for="f-rol" class="block text-sm font-semibold"
@@ -531,7 +449,7 @@ for (const item of bitacora) {
                 >
                 <option value="Otro">Otro</option>
               </select>
-              <p class="error-text text-red-text mt-1 hidden text-sm" />
+              <p class="error-text text-ink mt-1 hidden text-sm font-semibold" />
             </div>
             <div>
               <label for="f-mensaje" class="block text-sm font-semibold"
@@ -544,7 +462,7 @@ for (const item of bitacora) {
                 required
                 class="border-line bg-surface mt-1 w-full rounded-lg border px-3 py-2 text-base"
               ></textarea>
-              <p class="error-text text-red-text mt-1 hidden text-sm" />
+              <p class="error-text text-ink mt-1 hidden text-sm font-semibold" />
             </div>
             <button
               type="submit"
@@ -565,25 +483,6 @@ for (const item of bitacora) {
 </BaseLayout>
 
 <script>
-  const filtros = document.getElementById('bitacora-filtros');
-  const lista = document.getElementById('bitacora-lista');
-
-  filtros?.addEventListener('click', (event) => {
-    const button = (event.target as HTMLElement)?.closest('button');
-    if (!button || !lista) return;
-    const filtro = button.dataset.filtro ?? 'todo';
-
-    filtros
-      .querySelectorAll('button')
-      .forEach((b) => b.setAttribute('aria-pressed', 'false'));
-    button.setAttribute('aria-pressed', 'true');
-
-    lista.querySelectorAll<HTMLElement>('li[data-tipo]').forEach((item) => {
-      const visible = filtro === 'todo' || item.dataset.tipo === filtro;
-      item.hidden = !visible;
-    });
-  });
-
   const form = document.getElementById('form-sumate') as HTMLFormElement | null;
 
   form?.addEventListener('submit', (event) => {

@@ -8,57 +8,52 @@
 @theme {
   --color-paper: #f7f5ef;
   --color-surface: #fffdf8;
-  --color-ink: #151515;
-  --color-muted: #69655e;
-  --color-line: #e1ddd4;
+  --color-ink: #24211d;
+  --color-body: #3d3934;
+  --color-muted: #6f6a62;
+  --color-line: #e3dfd6;
   --color-red: #d3311d;
   --color-red-text: #c42b18;
-  --color-rule: #d6e0ea;
 
   --font-display: 'Outfit Variable', Arial, sans-serif;
   --font-body: 'Manrope Variable', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --text-xs: 0.875rem;
   --text-sm: 1.0625rem;
   --text-md: 1.3125rem;
   --text-lg: 1.75rem;
   --text-xl: 2.5rem;
-  --text-hero: clamp(2.6rem, 6.4vw, 5.6rem);
-}
+  --text-hero: clamp(2rem, 4.2vw, 3.4rem);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-paper: #1b221f;
-    --color-surface: #222b27;
-    --color-ink: #eceae2;
-    --color-muted: #a6aba3;
-    --color-line: #34403a;
-    --color-red: #f0624a;
-    --color-red-text: #f27a64;
-    --color-rule: #2b3631;
-  }
+  --radius-ui: 10px;
 }
 
 /*
+ * Light only, by design: the site always looks like the deck's paper, with
+ * no prefers-color-scheme override. Contrast on #f7f5ef (verified):
+ * ink #24211d 14.7:1, body #3d3934 10.5:1, muted #6f6a62 4.92:1 (>= 4.5:1),
+ * red #d3311d 4.56:1. Red is kept as a small accent only: the wordmark
+ * slash, the focus ring, and the "Piloto" status tag — not a background or
+ * a primary action color; the primary button uses --color-ink instead.
+ *
  * Shape rule for the public site (keeps the brand consistent across sections):
  * - buttons / inputs: 8px radius
  * - screenshots: 10px radius, 1px solid border in --color-line
  * - status tags: 4px radius
+ *
+ * Layout: a normal centered container (`.page-container`, max-width ~1200px,
+ * symmetric gutters: 16px mobile, 32px desktop). No margin column, no margin
+ * line. Section spacing is `.page-section` (~6rem desktop, ~4rem mobile).
  */
 
 :root {
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
-}
-
 body {
   background: var(--color-paper);
-  color: var(--color-ink);
+  color: var(--color-body);
   font-family: var(--font-body);
   line-height: 1.6;
 }
@@ -69,6 +64,7 @@ h3,
 h4 {
   font-family: var(--font-display);
   font-weight: 650;
+  color: var(--color-ink);
 }
 
 .font-display {
@@ -77,9 +73,10 @@ h4 {
 
 .hero-title {
   font-size: var(--text-hero);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 650;
+  max-width: 18ch;
 }
 
 a,
@@ -107,123 +104,55 @@ summary {
   }
 }
 
-/*
- * El margen: the notebook's red margin line. On desktop <main> is a 3-column
- * grid (margin mark | rule | content); the continuous red line is an
- * absolutely-positioned child of <main> (not a grid row-span: `grid-row: 1 /
- * -1` resolves against the EXPLICIT grid, which has no rows here, so it only
- * ever spanned the first auto row — measured and confirmed, see commit
- * notes). Sections keep one grid row each (mark + content), spaced out with
- * `row-gap`. Fine-grained margin notes that must align to a specific line
- * inside a content cell (the hero's "Lo último" row, each bitácora entry's
- * date) use `.margen-nota`: an absolutely-positioned child of a
- * `position: relative` wrapper inside that content cell, offset back into
- * the margin column — this sidesteps subgrid entirely.
- * On mobile the grid collapses; each `.el-margen__section` instead renders
- * as a block with its own red bar via ::before.
- */
-main.el-margen {
-  display: block;
-  max-width: 1280px;
+.page-container {
+  max-width: 1200px;
   margin-inline: auto;
-  padding-inline: 1rem;
+  padding-inline: 16px;
 }
 
 @media (min-width: 768px) {
-  main.el-margen {
-    position: relative;
-    display: grid;
-    grid-template-columns: 9rem 2px minmax(0, 68rem);
-    column-gap: 2rem;
-    row-gap: 8rem;
-    padding-inline: 2rem;
-    padding-block: 4rem;
+  .page-container {
+    padding-inline: 32px;
   }
 }
 
-.el-margen__rule {
+.page-section {
+  padding-block: 2rem;
+}
+
+@media (min-width: 768px) {
+  .page-section {
+    padding-block: 3rem;
+  }
+}
+
+/* Clamp long copy to a fixed number of lines (used by the recursos cards). */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* The toggle button's chevron rotates when the <details> is open. */
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
   display: none;
-  background: var(--color-red);
-  transform: scaleY(0);
-  transform-origin: top;
 }
 
-@media (min-width: 768px) {
-  .el-margen__rule {
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    /* Containing block is main's padding box: back out past content's
-       padding-inline (2rem) + gap (2rem) + the 2px rule track + gap (2rem)
-       to land the line exactly between the margin and content columns. */
-    left: calc(2rem + 9rem + 2rem);
-    width: 2px;
-  }
+details[open] .chevron {
+  transform: rotate(180deg);
 }
 
-html.motion-ready .el-margen__rule {
-  animation: draw-margin 900ms ease-out forwards;
+.chevron {
+  transition: transform 200ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .el-margen__rule {
-    transform: scaleY(1);
-    animation: none;
-  }
-}
-
-@keyframes draw-margin {
-  to {
-    transform: scaleY(1);
-  }
-}
-
-.el-margen__mark {
-  font-size: 0.875rem;
-  color: var(--color-muted);
-}
-
-@media (min-width: 768px) {
-  .el-margen__section {
-    display: contents;
-  }
-
-  .el-margen__mark {
-    grid-column: 1;
-  }
-
-  .el-margen__content {
-    grid-column: 3;
-  }
-}
-
-@media (max-width: 767px) {
-  .el-margen__section {
-    position: relative;
-    display: block;
-    padding-left: 30px;
-    padding-right: 16px;
-    padding-block: 2.5rem;
-  }
-
-  .el-margen__section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 14px;
-    width: 3px;
-    background: var(--color-red);
-  }
-}
-
-/* A margin note tied to one specific line inside a content cell (see above). */
-@media (min-width: 768px) {
-  .margen-nota {
-    position: absolute;
-    top: 0;
-    left: calc(-9rem - 2rem - 2px - 2rem);
-    width: 9rem;
+  .chevron {
+    transition: none;
   }
 }

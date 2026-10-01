@@ -1,0 +1,98 @@
+---
+import { getImage } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import HeroShowcase from '@/components/react/HeroShowcase';
+
+export interface Props {
+  herramientas: CollectionEntry<'proyectos'>[];
+  recursos: CollectionEntry<'proyectos'>[];
+}
+
+const { herramientas, recursos } = Astro.props;
+
+// Deck order: the 4 herramientas (by orden, already sorted by the caller),
+// then the 3 most recent recursos.
+const deckSource = [...herramientas, ...recursos.slice(0, 3)];
+
+const showcaseProjects = await Promise.all(
+  deckSource.map(async ({ id, data }) => {
+    const optimized = await getImage({
+      src: data.captura,
+      width: 1200,
+      format: 'webp',
+    });
+    return {
+      id,
+      name: data.nombre,
+      category: data.tipo === 'herramienta' ? 'Herramienta' : (data.nivel ?? 'Recurso'),
+      screenshot: optimized.src,
+    };
+  }),
+);
+---
+
+<div class="compiler" aria-label="Vistas previas de proyectos de becode">
+  <div class="showcase-slot">
+    <HeroShowcase client:load projects={showcaseProjects} />
+  </div>
+</div>
+
+<style>
+  .compiler {
+    position: relative;
+    min-height: 35rem;
+    animation: hero-in 800ms 260ms both cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  .showcase-slot {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.97);
+    animation: product-in 600ms 520ms forwards cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+  }
+  @keyframes product-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .compiler {
+      min-height: 34rem;
+    }
+    .showcase-slot {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 37.5rem) {
+    .compiler {
+      min-height: 20rem;
+    }
+    .showcase-slot {
+      top: 0;
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .compiler,
+    .showcase-slot {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
