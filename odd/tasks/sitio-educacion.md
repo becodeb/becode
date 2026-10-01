@@ -130,6 +130,16 @@ RDD: off globally since 2026-09-23 (user decision) → no review ceremony; ordin
 - 2026-10-01: brief read; repo mapped; live apps probed; screenshots of tools and resources captured
   (scratchpad). Branch created.
 
+- 2026-10-01: T1-T3 done by delegated writer + parent fixes. Commits: 1472a60 (content model),
+  1d5544c (layout + home), 974df29 (margin line, spacing, bitácora), f5b9dd2 (grid, thumbnails, dates).
+  Evidence: astro check 0 errors (after `prisma generate`; the earlier 48 were a stale local client),
+  lint clean, full build OK; prod build serves / , /terminos-y-condiciones, /login, /registro,
+  /recuperar = 200; /app, /admin = 302. Captures 1440/390 light+dark, no horizontal overflow
+  (scrollWidth == clientWidth), red line height == main height, 20/20 images load.
+- Echo estado set to "piloto" provisionally (no real use yet); statuses of resources default to
+  "experimento" pending confirmation; dates = first git commit of each repo.
+
 ## Next step
 
-T1–T3 via one delegated writer, then the direction checkpoint.
+Direction checkpoint sent to the user (with question about doubtful apps: analitica, smartcampus,
+academia, mentelab). Wait for the answer before T4.
