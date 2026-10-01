@@ -139,6 +139,7 @@ for (const item of bitacora) {
                   height={70}
                   widths={[112, 224]}
                   formats={['webp']}
+                  pictureAttributes={{ class: 'shrink-0' }}
                   class="border-line h-[70px] w-[112px] shrink-0 rounded-[10px] border object-cover object-top"
                 />
                 <div>
@@ -218,7 +219,7 @@ for (const item of bitacora) {
           Para crear, evaluar, registrar y compartir
         </h2>
 
-        <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-3">
+        <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-6">
           {
             herramientas.map((item, index) => {
               // Grid placement is data-driven by index, not by a hardcoded
@@ -227,12 +228,12 @@ for (const item of bitacora) {
               // fill row 2 evenly.
               const placementClass =
                 index === 0
-                  ? 'lg:col-span-2 lg:col-start-1 lg:row-start-1'
+                  ? 'lg:col-span-4 lg:col-start-1 lg:row-start-1'
                   : index === 3
-                    ? 'lg:col-span-1 lg:col-start-3 lg:row-start-1'
+                    ? 'lg:col-span-2 lg:col-start-5 lg:row-start-1'
                     : index === 1
-                      ? 'lg:col-span-1 lg:col-start-1 lg:row-start-2'
-                      : 'lg:col-span-1 lg:col-start-2 lg:row-start-2';
+                      ? 'lg:col-span-3 lg:col-start-1 lg:row-start-2'
+                      : 'lg:col-span-3 lg:col-start-4 lg:row-start-2';
               const isMovil = item.data.formato === 'movil';
               return (
                 <article class:list={['flex flex-col', placementClass]}>
@@ -367,11 +368,11 @@ for (const item of bitacora) {
                       class="relative flex flex-col gap-3"
                     >
                       <div class="margen-nota hidden md:block" aria-hidden="true">
-                        <p class="text-red-text font-display text-sm">
+                        <p class="text-red-text font-display text-[1.25rem] leading-tight">
                           {formatoFecha(item.data.fecha)}
                         </p>
                       </div>
-                      <p class="text-red-text font-display text-sm md:hidden">
+                      <p class="text-red-text font-display text-base md:hidden">
                         {formatoFecha(item.data.fecha)}
                       </p>
                       <div class="flex gap-4">
@@ -384,6 +385,7 @@ for (const item of bitacora) {
                           sizes="(min-width: 640px) 176px, 96px"
                           formats={['webp']}
                           loading="lazy"
+                          pictureAttributes={{ class: 'shrink-0' }}
                           class="border-line h-[60px] w-[96px] shrink-0 rounded-[10px] border object-cover sm:h-[110px] sm:w-[176px]"
                         />
                         <div>
