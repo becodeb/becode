@@ -12,7 +12,7 @@ const defaultCanonical = new URL(
   Astro.site ?? Astro.url.origin,
 ).href;
 const { title, description, canonical = defaultCanonical } = Astro.props;
-const socialImage = new URL('/og.svg', Astro.site);
+const socialImage = new URL('/og.png', Astro.site);
 ---
 
 <!doctype html>

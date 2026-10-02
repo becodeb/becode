@@ -17,7 +17,6 @@ export interface ShowcaseProject {
   category: string;
   screenshot: string;
   url: string;
-  resumen: string;
 }
 
 export interface HeroShowcaseProps {
@@ -463,22 +462,21 @@ export default function HeroShowcase({ projects }: HeroShowcaseProps) {
       </div>
 
       {current && (
-        <div className="mt-12 flex flex-col-reverse items-start justify-between gap-4 sm:flex-row">
-          <div className="min-w-0">
-            <p
+        <div className="mt-12 flex items-center justify-between gap-4">
+          <p className="flex min-w-0 items-baseline gap-3">
+            <span
               aria-live="polite"
               className="font-display truncate text-base font-semibold"
             >
               {current.name}
-            </p>
-            <p className="text-muted line-clamp-2 text-sm">{current.resumen}</p>
+            </span>
             <a
               href={current.url}
-              className="mt-1 inline-block text-sm font-semibold underline underline-offset-4"
+              className="text-muted hover:text-ink shrink-0 text-sm font-semibold underline underline-offset-4"
             >
               Abrir
             </a>
-          </div>
+          </p>
           <div
             className="flex shrink-0 items-center gap-1.5 pt-1"
             role="group"
