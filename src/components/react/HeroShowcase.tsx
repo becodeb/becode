@@ -16,6 +16,8 @@ export interface ShowcaseProject {
   name: string;
   category: string;
   screenshot: string;
+  url: string;
+  resumen: string;
 }
 
 export interface HeroShowcaseProps {
@@ -39,9 +41,17 @@ const TUCK_Z = 2;
 const TUCK_MS = 0.48 * FLIGHT_DURATION_S * 1000;
 const SETTLE_MS = FLIGHT_DURATION_S * 1000;
 
-// Brand accents flashed during the shuffle (theme --color-signal / --color-line).
-const SIGNAL = '#d3311d';
-const LINE = '#e1ddd4';
+// Brand red flashed during the shuffle, toned down from the solid brand red.
+const FLIGHT_RED = '#d3311d';
+const LINE = '#e3dfd6';
+
+// Soft, warm shadows (ink-tinted, never pure black), scaled down with depth.
+const SHADOW_FRONT =
+  '0 1px 2px rgb(36 33 29 / 0.06), 0 18px 40px -12px rgb(36 33 29 / 0.18)';
+const SHADOW_MIDDLE =
+  '0 1px 2px rgb(36 33 29 / 0.05), 0 12px 28px -10px rgb(36 33 29 / 0.14)';
+const SHADOW_BACK =
+  '0 1px 1px rgb(36 33 29 / 0.04), 0 8px 18px -8px rgb(36 33 29 / 0.1)';
 
 type StackPosition = 'front' | 'middle' | 'back' | 'hidden';
 
@@ -71,70 +81,65 @@ interface StackSlot {
   boxShadow: string;
 }
 
-// Stepped deck: each card sits a bit lower than the one in front, all
-// fanned to the same side, the front one slightly tilted too.
+// Straight deck: depth reads from vertical offset, scale and opacity only —
+// no fanned rotation at rest.
 const SLOTS: Record<Exclude<StackPosition, 'hidden'>, StackSlot> = {
-  front: {
-    x: 0,
-    y: 0,
-    scale: 1,
-    opacity: 1,
-    rotateZ: 1.5,
-    boxShadow: '0 2rem 5rem rgb(67 48 28 / 0.2)',
-  },
+  front: { x: 0, y: 0, scale: 1, opacity: 1, rotateZ: 0, boxShadow: SHADOW_FRONT },
   middle: {
     x: 0,
-    y: 32,
-    scale: 0.94,
-    opacity: 0.88,
-    rotateZ: 2.8,
-    boxShadow: '0 1.1rem 2.6rem rgb(67 48 28 / 0.12)',
+    y: 18,
+    scale: 0.955,
+    opacity: 0.9,
+    rotateZ: 0,
+    boxShadow: SHADOW_MIDDLE,
   },
   back: {
     x: 0,
-    y: 60,
-    scale: 0.885,
-    opacity: 0.75,
-    rotateZ: 5,
-    boxShadow: '0 0.5rem 1.4rem rgb(67 48 28 / 0.07)',
+    y: 34,
+    scale: 0.91,
+    opacity: 0.78,
+    rotateZ: 0,
+    boxShadow: SHADOW_BACK,
   },
 };
 
-// The all-red card slotted between middle and back, fanned the same way.
-const RED_SLOT = { x: 0, y: 47, scale: 0.912, rotate: 4, z: 15 };
+// A thin red sliver peeking out from under the back of the deck — a brand
+// touch, not a full card.
+const RED_SLOT = { y: 44, height: 14 };
 
 // Waiting cards sit fully behind the deck, invisible until their turn.
 const HIDDEN_SLOT: StackSlot = {
   x: 0,
-  y: 66,
-  scale: 0.87,
+  y: 40,
+  scale: 0.9,
   opacity: 0,
-  rotateZ: 5,
-  boxShadow: '0 0.5rem 1.4rem rgb(67 48 28 / 0.07)',
+  rotateZ: 0,
+  boxShadow: SHADOW_BACK,
 };
 
-const PARALLAX_STRENGTH: Record<StackPosition, number> = {
-  front: 16,
-  middle: 10,
-  back: 5,
-  hidden: 5,
+// Pointer-tilt strength per depth: the front card reacts the most, cards
+// further back barely move — this is whole-card 3D tilt, not an inner
+// parallax of the screenshot.
+const TILT_STRENGTH: Record<StackPosition, number> = {
+  front: 1,
+  middle: 0.55,
+  back: 0.3,
+  hidden: 0,
 };
+const MAX_TILT_DEG = 4;
+const MAX_TILT_PX = 6;
 
-interface RedCardProps {
+interface RedSliverProps {
   front: number;
-  parallaxX: MotionValue<number>;
-  parallaxY: MotionValue<number>;
   reducedMotion: boolean;
 }
 
-// A plain red card living inside the deck: same size and radius as the
-// others, its own tilt and parallax layer, and a sympathetic dip on every
-// shuffle so it moves with the rest of the stack.
-function RedCard({ front, parallaxX, parallaxY, reducedMotion }: RedCardProps) {
+// A plain red sliver living under the deck: a thin strip, not a full card,
+// with a small sympathetic dip on every shuffle so it reads as part of the
+// stack without competing with it.
+function RedSliver({ front, reducedMotion }: RedSliverProps) {
   const controls = useAnimationControls();
   const mounted = useRef(false);
-  const x = useTransform(parallaxX, (value) => value * 7);
-  const y = useTransform(parallaxY, (value) => value * 7 * 0.6);
 
   useEffect(() => {
     if (!mounted.current) {
@@ -143,8 +148,7 @@ function RedCard({ front, parallaxX, parallaxY, reducedMotion }: RedCardProps) {
     }
     if (reducedMotion) return;
     controls.start({
-      y: [RED_SLOT.y, RED_SLOT.y + 36, RED_SLOT.y],
-      rotate: [RED_SLOT.rotate, RED_SLOT.rotate - 2.5, RED_SLOT.rotate],
+      y: [RED_SLOT.y, RED_SLOT.y + 10, RED_SLOT.y],
       transition: {
         duration: RISE_DURATION_S,
         ease: 'easeInOut',
@@ -154,44 +158,33 @@ function RedCard({ front, parallaxX, parallaxY, reducedMotion }: RedCardProps) {
   }, [front, reducedMotion, controls]);
 
   return (
-    <div
-      className="absolute inset-0"
-      style={{ zIndex: RED_SLOT.z }}
+    <motion.div
+      className="bg-red absolute inset-x-3 rounded-b-[12px]"
+      style={{
+        height: RED_SLOT.height,
+        boxShadow: '0 0.6rem 1.4rem rgb(211 49 29 / 0.14)',
+      }}
+      initial={{ y: RED_SLOT.y }}
+      animate={controls}
       aria-hidden="true"
-    >
-      <motion.div className="h-full w-full" style={{ x, y }}>
-        <motion.div
-          className="bg-red h-full w-full rounded-[var(--radius-ui)]"
-          style={{
-            transformOrigin: '50% 50%',
-            boxShadow: '0 0.9rem 2.2rem rgb(211 49 29 / 0.16)',
-          }}
-          initial={{
-            x: RED_SLOT.x,
-            y: RED_SLOT.y,
-            rotate: RED_SLOT.rotate,
-            scale: RED_SLOT.scale,
-          }}
-          animate={controls}
-        />
-      </motion.div>
-    </div>
+    />
   );
+}
+
+interface TiltMotion {
+  x: MotionValue<number>;
+  y: MotionValue<number>;
+  rotateX: MotionValue<number>;
+  rotateY: MotionValue<number>;
 }
 
 interface ShowcaseCardProps {
   project: ShowcaseProject;
   position: StackPosition;
-  parallaxX: MotionValue<number>;
-  parallaxY: MotionValue<number>;
+  tilt: TiltMotion;
 }
 
-function ShowcaseCard({
-  project,
-  position,
-  parallaxX,
-  parallaxY,
-}: ShowcaseCardProps) {
+function ShowcaseCard({ project, position, tilt }: ShowcaseCardProps) {
   const previousPosition = useRef(position);
   const [flightZ, setFlightZ] = useState<number | null>(null);
 
@@ -225,48 +218,50 @@ function ShowcaseCard({
   }, [position]);
 
   const slot = position === 'hidden' ? HIDDEN_SLOT : SLOTS[position];
-  const strength = PARALLAX_STRENGTH[position];
-  const x = useTransform(parallaxX, (value) => value * strength);
-  const y = useTransform(parallaxY, (value) => value * strength * 0.6);
+  const strength = TILT_STRENGTH[position];
+  const tiltX = useTransform(tilt.x, (value) => value * strength);
+  const tiltY = useTransform(tilt.y, (value) => value * strength);
+  const tiltRotateX = useTransform(tilt.rotateX, (value) => value * strength);
+  const tiltRotateY = useTransform(tilt.rotateY, (value) => value * strength);
 
-  // Deal-a-card path: lift and tilt up-to-the-right in a wide continuous
-  // arc, slide behind the red block while descending, then land in the back
-  // slot. x and y peak at different moments so the card never sits still.
-  // The card promoted to the front mirrors it: it slips out below-left and
-  // rises into place while the leaving card is still mid-air.
+  // Deal-a-card path: lift in a wide continuous arc, slide behind the deck
+  // while descending, then land in the back slot — with just enough tilt to
+  // read as a gesture, settling flat. The card promoted to the front mirrors
+  // it: it slips out below and rises into place while the leaving card is
+  // still mid-air.
   const target: TargetAndTransition = inFlight
     ? {
         ...slot,
-        x: [null, 110, 50, slot.x],
-        y: [null, -220, -95, slot.y],
-        rotateZ: [null, 9, 3.5, slot.rotateZ],
+        x: [null, 70, 30, slot.x],
+        y: [null, -200, -90, slot.y],
+        rotateZ: [null, 4, 1.5, slot.rotateZ],
         scale: [null, 0.88, 0.85, slot.scale],
         // Fully visible for the whole arc; if it lands on the hidden slot it
         // only fades once it is already tucked behind the deck.
         opacity: [null, 1, 1, slot.opacity],
-        borderColor: [null, SIGNAL, SIGNAL, LINE],
+        borderColor: [null, FLIGHT_RED, FLIGHT_RED, LINE],
         boxShadow: [
           null,
-          '0 1.8rem 4.2rem rgb(211 49 29 / 0.3)',
-          '0 1rem 2.6rem rgb(211 49 29 / 0.18)',
+          '0 1px 2px rgb(36 33 29 / 0.08), 0 1.4rem 3rem rgb(211 49 29 / 0.2)',
+          '0 1px 2px rgb(36 33 29 / 0.07), 0 1rem 2.2rem rgb(211 49 29 / 0.12)',
           slot.boxShadow,
         ],
       }
     : promoted
       ? {
           ...slot,
-          x: [null, -52, -20, slot.x],
-          y: [null, 62, 24, slot.y],
-          rotateZ: [null, -6, -2.5, slot.rotateZ],
+          x: [null, -34, -14, slot.x],
+          y: [null, 56, 22, slot.y],
+          rotateZ: [null, -3, -1, slot.rotateZ],
           scale: [null, 0.95, 0.985, slot.scale],
-          borderColor: [null, SIGNAL, LINE],
+          borderColor: [null, FLIGHT_RED, LINE],
         }
       : stepped
         ? {
             ...slot,
-            x: [null, -34, -14, slot.x],
-            y: [null, 82, 44, slot.y],
-            rotateZ: [null, -6, -2.5, slot.rotateZ],
+            x: [null, -22, -9, slot.x],
+            y: [null, 74, 40, slot.y],
+            rotateZ: [null, -3, -1, slot.rotateZ],
             scale: [null, 0.915, 0.93, slot.scale],
           }
         : { ...slot };
@@ -278,82 +273,79 @@ function ShowcaseCard({
   });
 
   return (
-    <motion.article
-      className="border-line bg-surface absolute inset-0 overflow-hidden rounded-[var(--radius-ui)] border"
+    <motion.div
+      className="absolute inset-0"
       style={{
+        x: tiltX,
+        y: tiltY,
+        rotateX: tiltRotateX,
+        rotateY: tiltRotateY,
+        transformPerspective: 1200,
         zIndex: flightZ ?? (inFlight ? LIFT_Z : SLOT_Z[position]),
-        transformOrigin: '50% 50%',
       }}
-      initial={false}
-      animate={target}
-      transition={
-        inFlight
-          ? {
-              default: { duration: FLIGHT_DURATION_S, ease: EASE },
-              x: seg(
-                FLIGHT_DURATION_S,
-                [0, 0.52, 0.78, 1],
-                ['easeOut', 'easeInOut', 'easeOut'],
-              ),
-              y: seg(
-                FLIGHT_DURATION_S,
-                [0, 0.42, 0.72, 1],
-                ['easeOut', 'easeIn', 'easeOut'],
-              ),
-              rotateZ: seg(
-                FLIGHT_DURATION_S,
-                [0, 0.48, 0.76, 1],
-                ['easeOut', 'easeInOut', 'easeOut'],
-              ),
-              scale: seg(
-                FLIGHT_DURATION_S,
-                [0, 0.48, 0.76, 1],
-                ['easeOut', 'easeInOut', 'easeOut'],
-              ),
-            }
-          : promoted || stepped
+    >
+      <motion.article
+        className="border-line bg-surface absolute inset-0 flex flex-col overflow-hidden rounded-[12px] border"
+        style={{ transformOrigin: '50% 50%' }}
+        initial={false}
+        animate={target}
+        transition={
+          inFlight
             ? {
-                default: { duration: RISE_DURATION_S, ease: EASE },
+                default: { duration: FLIGHT_DURATION_S, ease: EASE },
                 x: seg(
-                  RISE_DURATION_S,
-                  [0, 0.48, 0.76, 1],
+                  FLIGHT_DURATION_S,
+                  [0, 0.52, 0.78, 1],
                   ['easeOut', 'easeInOut', 'easeOut'],
                 ),
                 y: seg(
-                  RISE_DURATION_S,
-                  [0, 0.4, 0.72, 1],
-                  ['easeOut', 'easeInOut', 'easeOut'],
+                  FLIGHT_DURATION_S,
+                  [0, 0.42, 0.72, 1],
+                  ['easeOut', 'easeIn', 'easeOut'],
                 ),
                 rotateZ: seg(
-                  RISE_DURATION_S,
-                  [0, 0.44, 0.74, 1],
+                  FLIGHT_DURATION_S,
+                  [0, 0.48, 0.76, 1],
                   ['easeOut', 'easeInOut', 'easeOut'],
                 ),
                 scale: seg(
-                  RISE_DURATION_S,
-                  [0, 0.44, 0.74, 1],
+                  FLIGHT_DURATION_S,
+                  [0, 0.48, 0.76, 1],
                   ['easeOut', 'easeInOut', 'easeOut'],
                 ),
               }
-            : { default: { duration: SWAP_DURATION_S, ease: EASE } }
-      }
-    >
-      <motion.div className="flex h-full w-full flex-col" style={{ x, y }}>
-        <div className="border-line flex h-11 shrink-0 items-center gap-3 border-b px-4 text-xs font-bold">
-          <span
-            className="grid h-8 w-8 shrink-0 place-items-center"
-            aria-hidden="true"
-          >
-            <img
-              src="/brand-mark.webp"
-              alt=""
-              width={32}
-              height={32}
-              className="h-8 w-8 object-contain mix-blend-multiply"
-            />
+            : promoted || stepped
+              ? {
+                  default: { duration: RISE_DURATION_S, ease: EASE },
+                  x: seg(
+                    RISE_DURATION_S,
+                    [0, 0.48, 0.76, 1],
+                    ['easeOut', 'easeInOut', 'easeOut'],
+                  ),
+                  y: seg(
+                    RISE_DURATION_S,
+                    [0, 0.4, 0.72, 1],
+                    ['easeOut', 'easeInOut', 'easeOut'],
+                  ),
+                  rotateZ: seg(
+                    RISE_DURATION_S,
+                    [0, 0.44, 0.74, 1],
+                    ['easeOut', 'easeInOut', 'easeOut'],
+                  ),
+                  scale: seg(
+                    RISE_DURATION_S,
+                    [0, 0.44, 0.74, 1],
+                    ['easeOut', 'easeInOut', 'easeOut'],
+                  ),
+                }
+              : { default: { duration: SWAP_DURATION_S, ease: EASE } }
+        }
+      >
+        <div className="border-line flex h-10 shrink-0 items-center justify-between gap-3 border-b px-4">
+          <span className="font-display truncate text-sm font-semibold">
+            {project.name}
           </span>
-          <span className="truncate">{project.name}</span>
-          <span className="text-muted ml-auto shrink-0 font-mono text-[0.62rem] uppercase">
+          <span className="text-muted shrink-0 text-xs">
             {project.category}
           </span>
         </div>
@@ -366,8 +358,8 @@ function ShowcaseCard({
           decoding="async"
           className="min-h-0 w-full flex-1 object-cover object-top"
         />
-      </motion.div>
-    </motion.article>
+      </motion.article>
+    </motion.div>
   );
 }
 
@@ -375,64 +367,138 @@ export default function HeroShowcase({ projects }: HeroShowcaseProps) {
   const reducedMotion = useReducedMotion();
   const deck = projects;
   const [front, setFront] = useState(0);
-
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const parallaxX = useSpring(pointerX, {
-    stiffness: 120,
-    damping: 20,
-    mass: 0.4,
-  });
-  const parallaxY = useSpring(pointerY, {
-    stiffness: 120,
-    damping: 20,
-    mass: 0.4,
-  });
+  const [paused, setPaused] = useState(false);
+  const [finePointer, setFinePointer] = useState(false);
 
   useEffect(() => {
-    if (reducedMotion || deck.length < 2) return;
+    setFinePointer(window.matchMedia('(pointer: fine)').matches);
+  }, []);
+
+  const pointerActive = finePointer && !reducedMotion;
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const springConfig = { stiffness: 150, damping: 20 };
+  // Whole-card tilt: translate a few px and rotate a few degrees in 3D. The
+  // content inside each card never gets its own transform, so it never
+  // moves relative to the card.
+  const tiltX = useSpring(
+    useTransform(rawX, (value) => value * MAX_TILT_PX),
+    springConfig,
+  );
+  const tiltY = useSpring(
+    useTransform(rawY, (value) => value * MAX_TILT_PX * 0.6),
+    springConfig,
+  );
+  const tiltRotateY = useSpring(
+    useTransform(rawX, (value) => value * MAX_TILT_DEG),
+    springConfig,
+  );
+  const tiltRotateX = useSpring(
+    useTransform(rawY, (value) => value * -MAX_TILT_DEG),
+    springConfig,
+  );
+
+  useEffect(() => {
+    if (reducedMotion || deck.length < 2 || paused) return;
     const id = window.setInterval(
       () => setFront((current) => (current + 1) % deck.length),
       ROTATION_MS,
     );
     return () => window.clearInterval(id);
-  }, [reducedMotion, deck.length]);
+  }, [reducedMotion, deck.length, paused]);
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reducedMotion) return;
+    if (!pointerActive) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - bounds.left) / bounds.width - 0.5);
-    pointerY.set((event.clientY - bounds.top) / bounds.height - 0.5);
+    rawX.set((event.clientX - bounds.left) / bounds.width - 0.5);
+    rawY.set((event.clientY - bounds.top) / bounds.height - 0.5);
   };
 
-  const handlePointerLeave = () => {
-    pointerX.set(0);
-    pointerY.set(0);
+  const resetTilt = () => {
+    rawX.set(0);
+    rawY.set(0);
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setPaused(false);
+    }
   };
 
   if (deck.length === 0) return null;
 
+  const current = deck[front];
+
   return (
     <div
-      className="relative aspect-[16/10] w-full"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => {
+        setPaused(false);
+        resetTilt();
+      }}
+      onFocus={() => setPaused(true)}
+      onBlur={handleBlur}
     >
-      <RedCard
-        front={front}
-        parallaxX={parallaxX}
-        parallaxY={parallaxY}
-        reducedMotion={reducedMotion ?? false}
-      />
-      {deck.map((project, index) => (
-        <ShowcaseCard
-          key={project.id}
-          project={project}
-          position={positionFor((index - front + deck.length) % deck.length)}
-          parallaxX={parallaxX}
-          parallaxY={parallaxY}
-        />
-      ))}
+      <div
+        className="relative w-full"
+        style={{ aspectRatio: '16 / 10' }}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={resetTilt}
+      >
+        <RedSliver front={front} reducedMotion={reducedMotion ?? false} />
+        {deck.map((project, index) => (
+          <ShowcaseCard
+            key={project.id}
+            project={project}
+            position={positionFor((index - front + deck.length) % deck.length)}
+            tilt={{
+              x: tiltX,
+              y: tiltY,
+              rotateX: tiltRotateX,
+              rotateY: tiltRotateY,
+            }}
+          />
+        ))}
+      </div>
+
+      {current && (
+        <div className="mt-4 flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p
+              aria-live="polite"
+              className="font-display truncate text-base font-semibold"
+            >
+              {current.name}
+            </p>
+            <p className="text-muted truncate text-sm">{current.resumen}</p>
+            <a
+              href={current.url}
+              className="mt-1 inline-block text-sm font-semibold underline underline-offset-4"
+            >
+              Abrir
+            </a>
+          </div>
+          <div
+            className="flex shrink-0 items-center gap-1.5 pt-1"
+            role="group"
+            aria-label="Elegir proyecto"
+          >
+            {deck.map((project, index) => (
+              <button
+                key={project.id}
+                type="button"
+                aria-label={`Mostrar ${project.name}`}
+                aria-current={index === front}
+                onClick={() => setFront(index)}
+                className={`h-[3px] w-6 rounded-full transition-colors ${
+                  index === front ? 'bg-ink' : 'bg-line'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

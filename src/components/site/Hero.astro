@@ -24,75 +24,45 @@ const showcaseProjects = await Promise.all(
     return {
       id,
       name: data.nombre,
-      category: data.tipo === 'herramienta' ? 'Herramienta' : (data.nivel ?? 'Recurso'),
+      category:
+        data.tipo === 'herramienta' ? 'Herramienta' : (data.nivel ?? 'Recurso'),
       screenshot: optimized.src,
+      url: data.url,
+      resumen: data.resumen,
     };
   }),
 );
 ---
 
-<div class="compiler" aria-label="Vistas previas de proyectos de becode">
-  <div class="showcase-slot">
-    <HeroShowcase client:load projects={showcaseProjects} />
-  </div>
+<div
+  class="hero-showcase"
+  aria-label="Vistas previas de proyectos de becode"
+>
+  <HeroShowcase client:load projects={showcaseProjects} />
 </div>
 
 <style>
-  .compiler {
-    position: relative;
-    min-height: 35rem;
-    animation: hero-in 800ms 260ms both cubic-bezier(0.2, 0.75, 0.25, 1);
-  }
-
-  .showcase-slot {
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    width: 100%;
-    opacity: 0;
-    transform: translateY(1.5rem) scale(0.97);
-    animation: product-in 600ms 520ms forwards cubic-bezier(0.23, 1, 0.32, 1);
+  /*
+   * No absolute positioning and no min-height here: the deck sizes itself
+   * from its own aspect-ratio box (set in HeroShowcase) plus the caption row
+   * below, and the hero section's grid (`items-center`) centers this block
+   * against the text column. An absolute slot used to push the deck above
+   * the text; letting it flow in-grid keeps it aligned instead.
+   */
+  .hero-showcase {
+    animation: hero-in 700ms 220ms both cubic-bezier(0.2, 0.75, 0.25, 1);
   }
 
   @keyframes hero-in {
     from {
       opacity: 0;
-      transform: translateY(1.25rem);
-    }
-  }
-  @keyframes product-in {
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @media (max-width: 63.99rem) {
-    .compiler {
-      min-height: 34rem;
-    }
-    .showcase-slot {
-      width: 100%;
-    }
-  }
-
-  @media (max-width: 37.5rem) {
-    .compiler {
-      min-height: 20rem;
-    }
-    .showcase-slot {
-      top: 0;
-      width: 100%;
+      transform: translateY(1rem);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .compiler,
-    .showcase-slot {
+    .hero-showcase {
       animation: none;
-      opacity: 1;
-      transform: none;
     }
   }
 </style>
