@@ -24,7 +24,7 @@
   --text-md: 1.3125rem;
   --text-lg: 1.75rem;
   --text-xl: 2.5rem;
-  --text-hero: clamp(2rem, 4.2vw, 3.4rem);
+  --text-hero: clamp(2rem, 3.6vw, 3.1rem);
 
   --radius-ui: 10px;
 }

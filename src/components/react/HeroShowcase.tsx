@@ -463,7 +463,7 @@ export default function HeroShowcase({ projects }: HeroShowcaseProps) {
       </div>
 
       {current && (
-        <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="mt-12 flex flex-col-reverse items-start justify-between gap-4 sm:flex-row">
           <div className="min-w-0">
             <p
               aria-live="polite"
@@ -471,7 +471,7 @@ export default function HeroShowcase({ projects }: HeroShowcaseProps) {
             >
               {current.name}
             </p>
-            <p className="text-muted truncate text-sm">{current.resumen}</p>
+            <p className="text-muted line-clamp-2 text-sm">{current.resumen}</p>
             <a
               href={current.url}
               className="mt-1 inline-block text-sm font-semibold underline underline-offset-4"
