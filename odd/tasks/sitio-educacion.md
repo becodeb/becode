@@ -150,7 +150,17 @@ RDD: off globally since 2026-09-23 (user decision) → no review ceremony; ordin
   summary click (15 rows = full proyectos count); colorScheme: 'dark' now renders pixel-identical
   to light.
 
+- 2026-10-02: user feedback rounds: green dark mode rejected -> light only, softer ink; margin
+  layout and red line removed (felt off-center); old hero carousel restored (whole-card tilt,
+  straight deck, caption); bitácora collapsed into "Recursos y experimentos" + details list;
+  hero trimmed (one sentence, one CTA, caption = name + Abrir). New og.png replaces agency og.svg.
+- 2026-10-02: user authorized production deploy via Coolify replacing the old site. Old version
+  saved on GitHub as branch `legacy/sitio-agencia` and tag `sitio-agencia-2026` (ea88321).
+- Open: terms page still holds the agency legal text (not rewritten: legal copy needs the user);
+  doubtful apps (analitica, smartcampus, academia, mentelab) still excluded; client portal copy
+  still agency-flavored (registro/login "Comenzá tu proyecto", /app/brief flow, portal chatbot
+  prompt in src/data/company-context.md).
+
 ## Next step
 
-Direction checkpoint sent to the user (with question about doubtful apps: analitica, smartcampus,
-academia, mentelab). Wait for the answer before T4.
+Merge to master, push (Coolify auto-deploys), verify production.
